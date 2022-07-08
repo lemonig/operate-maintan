@@ -1,0 +1,701 @@
+<div class="page_warp" *ngIf="!showAddPage && !showModifyPage">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="query_warp">
+      <span>工具名称：</span>
+      <input class="itemSpace" style="width: 200px" nz-input placeholder="请输入" [(ngModel)]="keyword" />
+      <span>固定资产类别：</span>
+      <nz-select style="width: 200px" [(ngModel)]="type" nzAllowClear nzPlaceHolder="请选择">
+        <nz-option  nzValue="0" nzLabel="全部"></nz-option>
+        <nz-option *ngFor="let item of toolTypeList" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+      </nz-select>&nbsp;&nbsp;
+      <button nz-button nzType="primary" (click)="search()">查询</button>
+      <button nz-button nzType="default" (click)="add()" *ngIf="userInfo.dataManager || userInfo.manager">新建</button>
+      <button nz-button nzType="default" (click)="download()" *ngIf="userInfo.dataManager || userInfo.manager">导出</button>
+    </div>
+    <nz-table class="table_warp" #basicTable [nzData]="tableData" [nzLoading]="loading" [(nzPageIndex)]="q.pageIndex"
+      [(nzTotal)]="q.total" [(nzPageSize)]="q.pageSize" [nzShowSizeChanger]="true" [nzFrontPagination]="false"
+      (nzPageIndexChange)="pageIndexChange($event)" (nzPageSizeChange)="pageSizeChange($event)">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th>序号</th>
+          <th>名称</th>
+          <th>物料编号</th>
+          <th>资产编号</th>
+          <th>规格</th>
+          <th>品牌</th>
+          <th>固定资产类别</th>
+          <th>负责人</th>
+          <th>联系电话</th>
+          <th *ngIf="userInfo.dataManager || userInfo.manager">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;index as i">
+          <td>{{i + 1 + ((q.pageIndex-1) * q.pageSize)}}</td>
+          <td>{{data.name}}</td>
+          <td>{{data.material_code}}</td>
+          <td>{{(data.asset_code)}}</td>
+          <td>{{data.version}}</td>
+          <td>{{data.unit}}</td>
+          <td>{{data.typeName}}</td>
+          <td>{{data.user}}</td>
+          <td>{{data.phone}}</td>
+          <td *ngIf="userInfo.dataManager || userInfo.manager">
+            <a (click)="modify(data.id)">修改</a>
+            <span class="divider"></span>
+            <a (click)="delete(data.id)">删除</a>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+<!-- 新增 -->
+<div class="page_warp" *ngIf="showAddPage">
+  <nz-page-header (nzBack)="showAddPage=false" nzBackIcon [nzSubtitle]="nzSubtitleAdd"> </nz-page-header>
+  <nz-card>
+    <form nz-form [formGroup]="addDataForm" role="form">
+      <nz-row>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">固定资产名称</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">固定资产编码</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="asset_code" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">固定资产类别</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请选择">
+              <nz-select style="width: 200px" formControlName="type" nzAllowClear nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of toolTypeList" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">物料编号</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="material_code" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">增加方式（资金来源）</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请选择">
+              <nz-select style="width: 200px" formControlName="increase_capital" nzAllowClear nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of toolCapital" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">增加方式（资产来源）</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请选择">
+              <nz-select style="width: 200px" formControlName="increase_assets" nzAllowClear nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of toolAssets" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">规格</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="version" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">品牌</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="brand" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">购入日期</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-date-picker style="width:200px;" formControlName="buy_date"></nz-date-picker>
+              </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">开始使用日期</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-date-picker style="width:200px;" formControlName="use_date"></nz-date-picker>
+              </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">使用情况</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请选择">
+              <nz-select style="width: 200px" formControlName="use_state" nzAllowClear nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of toolState" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">供应商</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="supplier" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">出厂日期</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-date-picker style="width:200px;" formControlName="production_date"></nz-date-picker>
+              </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">生产厂商</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="production_company" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">单价（税前）</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="money" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">数量</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="count" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">单位</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="unit" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">负责人</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请选择">
+              <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                (nzOnSearch)="filterPeopleList($event)" style="width: 200px" formControlName="user_id" nzAllowClear
+                nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of peopleList" [nzValue]="item.id" [nzLabel]="item.nickname"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">联系电话</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="phone" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">借用人</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请选择">
+              <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                (nzOnSearch)="filterOpsList($event)" style="width: 200px" formControlName="borrower_id" nzAllowClear
+                nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of opsList" [nzValue]="item.id" [nzLabel]="item.nickname"></nz-option>
+              </nz-select>
+            </nz-form-control>
+            </nz-form-item>
+        </nz-col>
+
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">使用部门</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="borrow_department" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+       <nz-col [nzSm]="8">
+         <nz-form-item>
+           <nz-form-label nzRequired nzSpan="6">省份</nz-form-label>
+           <nz-form-control nzSpan="18" nzErrorTip="请选择">
+             <nz-select style="width: 200px" (ngModelChange)="provinceChange($event)" formControlName="region_key"
+               nzPlaceHolder="请选择">
+               <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title">
+               </nz-option>
+             </nz-select>
+           </nz-form-control>
+         </nz-form-item>
+       </nz-col>
+       <nz-col nzSpan="8">
+         <nz-form-item>
+           <nz-form-label nzRequired nzSpan="6">城市</nz-form-label>
+           <nz-form-control nzSpan="18" nzErrorTip="请选择">
+             <nz-select style="width: 200px" formControlName="city_key" (ngModelChange)="cityChange($event)"
+               nzPlaceHolder="请选择">
+               <nz-option *ngFor="let item of areaData.city" [nzValue]="item.key" [nzLabel]="item.title">
+               </nz-option>
+             </nz-select>
+           </nz-form-control>
+         </nz-form-item>
+       </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">存放地点（公司-楼层-部门/区-具体存放位置）</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="location" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">使用年限（累计月）</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="use_age" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label  nzSpan="6">资产净值</nz-form-label>
+            <nz-form-control nzSpan="18" >
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="equity" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label  nzSpan="6">资产残值</nz-form-label>
+            <nz-form-control nzSpan="18" >
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="residual" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label  nzSpan="6">清查结果</nz-form-label>
+            <nz-form-control nzSpan="18" >
+              <nz-select style="width: 200px" formControlName="result" nzAllowClear nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of toolResult" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label  nzSpan="6">备注</nz-form-label>
+            <nz-form-control nzSpan="18" >
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="description" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+
+
+
+      </nz-row>
+      <!-- <nz-row>
+        <nz-col nzSpan="24">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="2">备注</nz-form-label>
+            <nz-form-control nzSpan="22" nzErrorTip="请输入">
+              <textarea style="width: 200px" nz-input placeholder="请输入" formControlName="name"></textarea>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+      </nz-row> -->
+      <!-- <nz-row>
+        <nz-col nzSpan="24">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="2">工具图片</nz-form-label>
+            <nz-form-control nzSpan="22">
+              <nz-upload nzListType="picture-card" [nzCustomRequest]="fileUpload" [(nzFileList)]="fileList">
+                <i nz-icon nzType="plus"></i>
+                <div class="ant-upload-text">上传</div>
+              </nz-upload>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+      </nz-row> -->
+    </form>
+    <div>
+      <nz-row>
+        <nz-col nzSpan="2">
+        </nz-col>
+        <nz-col nzSpan="22">
+          <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="saveNewData()">保存</button>
+        </nz-col>
+      </nz-row>
+    </div>
+  </nz-card>
+</div>
+<!-- 修改 -->
+<div class="page_warp" *ngIf="showModifyPage">
+  <nz-page-header (nzBack)="showModifyPage=false" nzBackIcon [nzSubtitle]="nzSubtitleModify"> </nz-page-header>
+  <nz-card>
+    <form nz-form [formGroup]="modifyDataForm" role="form">
+      <nz-row>
+        <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">固定资产名称</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">固定资产编码</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="asset_code" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">固定资产类别</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请选择">
+               <nz-select style="width: 200px" formControlName="type" nzAllowClear nzPlaceHolder="请选择">
+                 <nz-option *ngFor="let item of toolTypeList" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+               </nz-select>
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">物料编号</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="material_code" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">增加方式（资金来源）</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请选择">
+               <nz-select style="width: 200px" formControlName="increase_capital" nzAllowClear nzPlaceHolder="请选择">
+                 <nz-option *ngFor="let item of toolCapital" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+               </nz-select>
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">增加方式（资产来源）</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请选择">
+               <nz-select style="width: 200px" formControlName="increase_assets" nzAllowClear nzPlaceHolder="请选择">
+                 <nz-option *ngFor="let item of toolAssets" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+               </nz-select>
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">规格</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="version" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">品牌</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="brand" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">购入日期</nz-form-label>
+               <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                 <nz-date-picker style="width:200px;" formControlName="buy_date"></nz-date-picker>
+               </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">开始使用日期</nz-form-label>
+               <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                 <nz-date-picker style="width:200px;" formControlName="use_date"></nz-date-picker>
+               </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">使用情况</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请选择">
+               <nz-select style="width: 200px" formControlName="use_state" nzAllowClear nzPlaceHolder="请选择">
+                 <nz-option *ngFor="let item of toolState" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+               </nz-select>
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">供应商</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="supplier" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">出厂日期</nz-form-label>
+               <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                 <nz-date-picker style="width:200px;" formControlName="production_date"></nz-date-picker>
+               </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">生产厂商</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="production_company" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">单价（税前）</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="money" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">数量</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="count" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">单位</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="unit" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">负责人</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请选择">
+               <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                 (nzOnSearch)="filterPeopleList($event)" style="width: 200px" formControlName="user_id" nzAllowClear
+                 nzPlaceHolder="请选择">
+                 <nz-option *ngFor="let item of peopleList" [nzValue]="item.id" [nzLabel]="item.nickname"></nz-option>
+               </nz-select>
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">联系电话</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="phone" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">借用人</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请选择">
+               <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                 (nzOnSearch)="filterOpsList($event)" style="width: 200px" formControlName="borrower_id" nzAllowClear
+                 nzPlaceHolder="请选择">
+                 <nz-option *ngFor="let item of opsList" [nzValue]="item.id" [nzLabel]="item.nickname"></nz-option>
+               </nz-select>
+             </nz-form-control>
+             </nz-form-item>
+         </nz-col>
+        
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">使用部门</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="borrow_department" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+        <nz-col [nzSm]="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">省份</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请选择">
+              <nz-select style="width: 200px" (ngModelChange)="provinceChange($event)" formControlName="region_key"
+                nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">城市</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请选择">
+              <nz-select style="width: 200px" formControlName="city_key" (ngModelChange)="cityChange($event)"
+                nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of areaData.city" [nzValue]="item.key" [nzLabel]="item.title">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">存放地点（公司-楼层-部门/区-具体存放位置）</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="location" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">使用年限（累计月）</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请输入">
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="use_age" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label  nzSpan="6">资产净值</nz-form-label>
+             <nz-form-control nzSpan="18" >
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="equity" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label  nzSpan="6">资产残值</nz-form-label>
+             <nz-form-control nzSpan="18" >
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="residual" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label  nzSpan="6">清查结果</nz-form-label>
+             <nz-form-control nzSpan="18" >
+               <nz-select style="width: 200px" formControlName="result" nzAllowClear nzPlaceHolder="请选择">
+                 <nz-option *ngFor="let item of toolResult" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+               </nz-select>
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+         <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label  nzSpan="6">备注</nz-form-label>
+             <nz-form-control nzSpan="18" >
+               <input style="width:200px;" nz-input placeholder="请输入" formControlName="description" />
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+
+
+
+      </nz-row>
+      <!-- <nz-row>
+        <nz-col nzSpan="24">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="2">备注</nz-form-label>
+            <nz-form-control nzSpan="22" nzErrorTip="请输入">
+              <textarea style="width: 200px" nz-input placeholder="请输入" formControlName="name"></textarea>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+      </nz-row> -->
+      <!-- <nz-row>
+        <nz-col nzSpan="24">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="2">工具图片</nz-form-label>
+            <nz-form-control nzSpan="22">
+              <nz-upload nzListType="picture-card" [nzCustomRequest]="fileUpload" [(nzFileList)]="fileList">
+                <i nz-icon nzType="plus"></i>
+                <div class="ant-upload-text">上传</div>
+              </nz-upload>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+      </nz-row> -->
+    </form>
+    <div>
+      <nz-row>
+        <nz-col nzSpan="2">
+        </nz-col>
+        <nz-col nzSpan="22">
+          <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="saveModifyData()">保存</button>
+        </nz-col>
+      </nz-row>
+    </div>
+  </nz-card>
+</div>
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      物料库管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      工具清单管理
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleAdd>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      物料库管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      工具清单管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      新增
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleModify>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      物料库管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      工具清单管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      修改
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

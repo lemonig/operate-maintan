@@ -1,0 +1,38 @@
+<div class="list_warp">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+
+  <nz-tabset [(nzSelectedIndex)]="currentTab" (nzSelectChange)="changeTab()">
+    <nz-tab nzTitle="省份">
+      <ng-container *ngIf="currentTab == 0">
+        <app-abnormal-city></app-abnormal-city>
+      </ng-container>
+    </nz-tab>
+    <nz-tab nzTitle="站点">
+      <ng-container *ngIf="currentTab == 1">
+        <app-abnormal-site></app-abnormal-site>
+      </ng-container>
+    </nz-tab>
+    <nz-tab nzTitle="合同">
+      <ng-container *ngIf="currentTab == 2">
+        <app-abnormal-contract></app-abnormal-contract>
+      </ng-container>
+    </nz-tab>
+    <nz-tab nzTitle="员工">
+      <ng-container *ngIf="currentTab == 3">
+        <app-abnormal-staff></app-abnormal-staff>
+      </ng-container>
+    </nz-tab>
+  </nz-tabset>
+
+</div>
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      异常任务
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

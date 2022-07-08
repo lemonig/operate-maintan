@@ -1,0 +1,155 @@
+<div class="page_warp">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+  <div class="page_warp" *ngIf="userInfo.dataManager || userInfo.manager">
+   <nz-page-header (nzBack)="showAddPage=false" nzBackIcon [nzSubtitle]="nzSubtitleAdd"> </nz-page-header>
+   <nz-card>
+     <form nz-form [formGroup]="settingForm" role="form">
+       <nz-card nzTitle="车辆里程填报错误(里程填写错误删除重新填写)">
+         <nz-row>
+           <nz-col nzSpan="8">
+             <nz-form-item>
+               <nz-form-label nzRequired nzSpan="6">车辆使用人</nz-form-label>
+               <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                 <input style="width:200px;" nz-input placeholder="请输入" formControlName="stage_str" />
+               </nz-form-control>
+             </nz-form-item>
+           </nz-col>
+           <nz-col nzSpan="8">
+             <nz-form-item>
+               <nz-form-label nzRequired nzSpan="6">车牌号</nz-form-label>
+               <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                 <input style="width:200px;" nz-input placeholder="请输入" formControlName="car_num" />
+               </nz-form-control>
+             </nz-form-item>
+           </nz-col>
+           <nz-col nzSpan="8">
+             <nz-form-item>
+               <nz-form-label nzRequired nzSpan="6">车辆填写错误里程</nz-form-label>
+               <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                 <input style="width:200px;" nz-input placeholder="请输入" formControlName="mileage" />
+               </nz-form-control>
+             </nz-form-item>
+           </nz-col>
+          </nz-row>
+          <nz-row>
+            <nz-col nzSpan="24">
+             <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="delData()">删除该条记录</button>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+      </form>
+      <!-- <form nz-form [formGroup]="carStartForm" role="form">
+        <nz-card nzTitle="车辆里程初始值设置(里程差值过大,从本月初开始记录初始数值)">
+          <nz-row>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">车辆起始里程</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="stage_str" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">车牌号</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="car_num" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">项目号</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="mileage" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+           </nz-row>
+           <nz-row>
+             <nz-col nzSpan="24">
+              <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="delData()">删除该条记录</button>
+             </nz-col>
+           </nz-row>
+         </nz-card>
+       </form> -->
+    </nz-card>
+    <nz-card>
+        <nz-card nzTitle="仪器重复">
+          <nz-row>
+            <nz-col nzSpan="10">
+             正确仪器：
+              <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                (nzOnSearch)="filterOpsList($event)" style="width: 80%" [(ngModel)]="newMode" nzAllowClear
+                nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of instrumentList" [nzValue]="item" [nzLabel]="item.name+' '+ item.version+' ' + item.company_str">
+                </nz-option>
+              </nz-select>
+            </nz-col>
+            <nz-col nzSpan="11">
+              重复仪器：
+              <nz-select  [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder" nzMode="multiple" nzServerSearch [nzFilterOption]="nzFilterOption"
+                (nzOnSearch)="filterOpsList($event)" style="width: 80%" [(ngModel)]="oldMode" nzAllowClear
+                nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of instrumentList" [nzValue]="item.id" [nzLabel]="item.name+' '+ item.version+' ' + item.company_str">
+                </nz-option>
+              </nz-select>
+              <ng-template #tagPlaceHolder let-selectedList>and {{ selectedList.length }} more selected</ng-template>
+            </nz-col>
+             <nz-col nzSpan="3">
+              <button nz-button nzType="primary"  (click)="delInstrument()">删除重复</button>
+             </nz-col>
+           </nz-row>
+         </nz-card>
+       <!-- <form nz-form [formGroup]="carStartForm" role="form">
+         <nz-card nzTitle="车辆里程初始值设置(里程差值过大,从本月初开始记录初始数值)">
+           <nz-row>
+             <nz-col nzSpan="8">
+               <nz-form-item>
+                 <nz-form-label nzRequired nzSpan="6">车辆起始里程</nz-form-label>
+                 <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                   <input style="width:200px;" nz-input placeholder="请输入" formControlName="stage_str" />
+                 </nz-form-control>
+               </nz-form-item>
+             </nz-col>
+             <nz-col nzSpan="8">
+               <nz-form-item>
+                 <nz-form-label nzRequired nzSpan="6">车牌号</nz-form-label>
+                 <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                   <input style="width:200px;" nz-input placeholder="请输入" formControlName="car_num" />
+                 </nz-form-control>
+               </nz-form-item>
+             </nz-col>
+             <nz-col nzSpan="8">
+               <nz-form-item>
+                 <nz-form-label nzRequired nzSpan="6">项目号</nz-form-label>
+                 <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                   <input style="width:200px;" nz-input placeholder="请输入" formControlName="mileage" />
+                 </nz-form-control>
+               </nz-form-item>
+             </nz-col>
+            </nz-row>
+            <nz-row>
+              <nz-col nzSpan="24">
+               <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="delData()">删除该条记录</button>
+              </nz-col>
+            </nz-row>
+          </nz-card>
+        </form> -->
+     </nz-card>
+   </div>
+  </nz-card>
+</div>
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      高级权限
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      高级权限设置
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

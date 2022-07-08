@@ -1,0 +1,154 @@
+<div class="page_warp" *ngIf="!showDetailPage">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="query_warp">
+      <div class="searchItem itemSpace">
+        <span>签到时间：</span>
+        <nz-range-picker [(ngModel)]="dateRange"></nz-range-picker>
+      </div>
+      <div class="searchItem itemSpace">
+        <span>所属区域：</span>
+        <nz-select style="width: 200px" [(ngModel)]="orgKey" nzAllowClear nzPlaceHolder="请选择">
+          <nz-option *ngFor="let item of regionList" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+        </nz-select>
+        <!-- <nz-tree-select style="width: 200px" [nzNodes]="orgNodes" nzPlaceHolder="请选择" [(ngModel)]="org">
+        </nz-tree-select> -->
+      </div>
+      <div class="searchItem itemSpace">
+        <button nz-button nzType="primary" (click)="search()">查询</button>
+        <button nz-button nzType="default" (click)="download()">导出</button>
+      </div>
+    </div>
+    <nz-table class="table_warp" #basicTable [nzData]="tableData" [nzLoading]="loading" [(nzPageIndex)]="q.pageIndex"
+      [(nzTotal)]="q.total" [(nzPageSize)]="q.pageSize" [nzShowSizeChanger]="true" [nzFrontPagination]="false"
+      (nzPageIndexChange)="pageIndexChange($event)" (nzPageSizeChange)="pageSizeChange($event)">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th>序号</th>
+          <th>签到人员</th>
+          <th>签到时间</th>
+          <th>签到地址</th>
+          <th>备注</th>
+          <th>站点名称</th>
+          <th>所在区域</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;index as i">
+          <td>{{i + 1 + ((q.pageIndex-1) * q.pageSize)}}</td>
+          <td>{{data.user?.nickname}}</td>
+          <td>{{data.gmt_create | date:'yyyy-MM-dd HH:mm'}}</td>
+          <td>{{data.address}}</td>
+          <td>{{data.description}}</td>
+          <td>{{data.station}}</td>
+          <td>{{(data.region)}}</td>
+          <td>
+            <a (click)="detail(data.id)">详情</a>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+<!-- 详情 -->
+<div class="page_warp" *ngIf="showDetailPage">
+  <nz-page-header (nzBack)="showDetailPage=false" nzBackIcon [nzSubtitle]="nzSubtitleDetail"> </nz-page-header>
+  <nz-card>
+    <nz-row>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">站点名称</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.station}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">所属区域</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{(detailData.region ? detailData.region: '') + (detailData.city ? detailData.city: '')}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">签到人员</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.user ? detailData.user.nickname : ''}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">签到时间</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.gmt_create | date:'yyyy-MM-dd HH:mm'}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">经度</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.coordinate1}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">纬度</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.coordinate2}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">签到位置</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.address}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+    </nz-row>
+    <nz-row>
+      <nz-col nzSpan="24">
+        <p>备注：{{detailData.description}}</p>
+        <p>备注照片：
+          <img *ngFor="let item of detailData.pictures" (click)="bigImg(item)" class="imgList" [src]="item">
+        </p>
+      </nz-col>
+    </nz-row>
+  </nz-card>
+</div>
+
+<!-- 放大图片 -->
+<nz-modal nzWidth="1000" nzMask="false" [(nzVisible)]="showBigImg" nzTitle="图片" [nzCancelText]="null"
+  (nzOnCancel)="showBigImg=false" [nzOkText]="null">
+  <div class="bigImg_warp" *ngIf="showBigImg">
+    <img [src]="bigImgUrl">
+  </div>
+</nz-modal>
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      签到记录
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleDetail>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      签到记录
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      详情
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

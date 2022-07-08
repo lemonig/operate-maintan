@@ -1,0 +1,333 @@
+<div class="page_warp">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="user_btns">
+      <span>关键字：</span>
+      <input class="itemSpace" nz-input style="width:180px;" placeholder="请输入车牌号/GPS编号" [(ngModel)]="keyword" />
+      <input class="itemSpace" nz-input style="width:180px;" placeholder="请输入合同号" [(ngModel)]="contract" />
+      <button nz-button nzType="primary" (click)="refresh()">查询</button>
+      <button *ngIf="userInfo.dataManager || userInfo.manager" nz-button nzType="primary" (click)="add()">添加</button>
+      <span style="display: inline-block;float: right;">车辆总数：{{count}}</span>
+    </div>
+    <nz-table class="table_warp" #basicTable [nzPageSize]="20" [(nzPageIndex)]="pageIndex" [nzData]="tableData"
+      [nzLoading]="loading">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th nzWidth="5%">序号</th>
+          <th nzWidth="10%">所属省份</th>
+          <th nzWidth="10%">GPS编号</th>
+          <th nzWidth="10%">车牌</th>
+          <th nzWidth="10%">车辆品牌</th>
+          <th nzWidth="10%">购车时间</th>
+          <th nzWidth="5%">负责人</th>
+          <th nzWidth="10%">发动机号</th>
+          <th nzWidth="10%">车架号</th>
+          <th >是否弃用</th>
+          <th *ngIf="userInfo.dataManager || userInfo.manager">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;index as i">
+          <td>{{i + 1 + ((pageIndex-1) * 20)}}</td>
+          <td>{{data.region}}</td>
+          <td>{{data.imei}}</td>
+          <td>{{data.car_num}}</td>
+          <td>{{data.vehicleModel}}</td>
+          <td>{{data.buyTime | date:'yyyy-MM-dd'}}</td>
+          <td>{{data.driver}}</td>
+          <td>{{data.engine}}</td>
+          <td >{{data.vid}}</td>
+          <td>
+            <!-- <nz-switch [nzControl]="true" (click)="changeLogin(data.id)" [ngModel]="data.active" nzCheckedChildren="开"
+              nzUnCheckedChildren="关"></nz-switch> -->
+            <img class="switchIcon" (click)="changeActive(data.id)" *ngIf="!data.delete"
+              src="../../../../assets/tmp/img/switchIcon.png">
+            <img class="switchIcon" (click)="changeActive(data.id)" *ngIf="data.delete"
+              src="../../../../assets/tmp/img/switchIcon1.png">
+          </td>
+          <td *ngIf="userInfo.dataManager || userInfo.manager">
+            <a (click)="modifyData(data.id)">修改</a>
+            <span class="divider"></span>
+            <a (click)="delete(data.id)">删除</a>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+
+<!-- 新增数据 -->
+<nz-modal nzMask="false" nzWidth="650" [(nzVisible)]="newDataModal" nzTitle="新增" [nzOkLoading]="isOkLoading"
+  (nzOnCancel)="newDataModal=false" (nzOnOk)="handleNewData()">
+  <form *ngIf="newDataModal" nz-form [formGroup]="addDataForm" (ngSubmit)="handleNewData()" role="form">
+    <nz-row>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="6">车牌</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="car_num" placeholder="请输入车牌">
+            </nz-input-group>
+            <nz-form-explain
+              *ngIf="validateForm('car_num').dirty && validateForm('car_num').hasError('required')">请输入车牌
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="6">车辆品牌</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="vehicleModel" placeholder="请输入车辆品牌">
+            </nz-input-group>
+            <nz-form-explain
+              *ngIf="validateForm('vehicleModel').dirty && validateForm('vehicleModel').hasError('required')">请输入车辆品牌
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzSm]="6">发动机号</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="engine" placeholder="请输入发动机号">
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzSm]="6">机架号</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="vid" placeholder="请输入机架号">
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label  [nzSm]="6">GPS编号</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="imei" placeholder="请输入GPS编号">
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="6">购车时间</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-date-picker nzSize="large" style="width:100%;" class="datePicker" formControlName="buyTime">
+            </nz-date-picker>
+            <nz-form-explain *ngIf="validateForm('buyTime').dirty && validateForm('buyTime').hasError('required')">
+              请选择购车时间
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="6">所属省份</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-select style="width: 100%;" formControlName="regionKey" nzSize="large" nzAllowClear
+              nzPlaceHolder="请选择所属省份">
+              <nz-option *ngFor="let item of metaData.provinces" [nzValue]="item.value" [nzLabel]="item.label">
+              </nz-option>
+            </nz-select>
+            <nz-form-explain *ngIf="validateForm('regionKey').dirty && validateForm('regionKey').hasError('required')">
+              请选择所属省份
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="6">城市</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="city" placeholder="请输入城市">
+            </nz-input-group>
+            <nz-form-explain *ngIf="validateForm('city').dirty && validateForm('city').hasError('required')">请输入城市
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzSm]="6">负责人</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-select nzSize="large" nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+              (nzOnSearch)="filterOpsList($event)" style="width: 100%" formControlName="driver_id" nzAllowClear
+              nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of opsList" [nzValue]="item.id" [nzLabel]="item.nickname"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzSm]="6">备注</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="description" placeholder="请输入备注">
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+    </nz-row>
+  </form>
+</nz-modal>
+<!-- 修改数据 -->
+<nz-modal nzMask="false" nzWidth="650" [(nzVisible)]="modifyDataModal" nzTitle="修改" [nzOkLoading]="isOkLoading"
+  (nzOnCancel)="modifyDataModal=false" (nzOnOk)="handleModifyData()">
+  <form *ngIf="modifyDataModal" nz-form [formGroup]="modifyDataForm" (ngSubmit)="handleModifyData()" role="form">
+    <nz-row>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="6">车牌</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="car_num" placeholder="请输入车牌">
+            </nz-input-group>
+            <nz-form-explain
+              *ngIf="validateForm1('car_num').dirty && validateForm1('car_num').hasError('required')">请输入车牌
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="6">车辆品牌</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="vehicleModel" placeholder="请输入车辆品牌">
+            </nz-input-group>
+            <nz-form-explain
+              *ngIf="validateForm1('vehicleModel').dirty && validateForm1('vehicleModel').hasError('required')">请输入车辆品牌
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzSm]="6">发动机号</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="engine" placeholder="请输入发动机号">
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzSm]="6">机架号</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="vid" placeholder="请输入机架号">
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label  [nzSm]="6">GPS编号</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="imei" placeholder="请输入GPS编号">
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="6">购车时间</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-date-picker nzSize="large" style="width:100%;" class="datePicker" formControlName="buyTime">
+            </nz-date-picker>
+            <nz-form-explain *ngIf="validateForm1('buyTime').dirty && validateForm1('buyTime').hasError('required')">
+              请选择购车时间
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="6">所属省份</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-select style="width: 100%;" formControlName="regionKey" nzSize="large" nzAllowClear
+              nzPlaceHolder="请选择所属省份">
+              <nz-option *ngFor="let item of metaData.provinces" [nzValue]="item.value" [nzLabel]="item.label">
+              </nz-option>
+            </nz-select>
+            <nz-form-explain
+              *ngIf="validateForm1('regionKey').dirty && validateForm1('regionKey').hasError('required')">
+              请选择所属省份
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="6">城市</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="city" placeholder="请输入城市">
+            </nz-input-group>
+            <nz-form-explain *ngIf="validateForm1('city').dirty && validateForm1('city').hasError('required')">请输入城市
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzSm]="6">负责人</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-select nzSize="large"  nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+              (nzOnSearch)="filterOpsList($event)" style="width: 100%" formControlName="driver_id" nzAllowClear
+              nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of opsList" [nzValue]="item.id" [nzLabel]="item.nickname"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzSm]="6">备注</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="description" placeholder="请输入备注">
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzSm]="6">所属合同</nz-form-label>
+          <nz-form-control [nzSm]="18" >
+            {{carContract}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+    </nz-row>
+  </form>
+</nz-modal>
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      车辆管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

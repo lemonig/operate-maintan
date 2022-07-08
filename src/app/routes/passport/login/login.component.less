@@ -1,0 +1,36 @@
+@import '~@delon/theme/styles/default';
+
+:host {
+  display: block;
+
+  #login-bg {
+    background-image: url("/assets/tmp/img/login-bg.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  #login-side-img {
+    background-image: url('/assets/tmp/img/login-side.png');
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 290px;
+  }
+
+  .login-area {
+    margin: 0 auto;
+    height: 540px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .login-form {
+    background: #fff;
+    width: 560px;
+  }
+
+  .login-area .ant-input-affix-wrapper .ant-input:not(:first-child) {
+    padding-left: 30px;
+  }
+
+}

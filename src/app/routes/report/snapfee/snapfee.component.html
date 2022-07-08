@@ -1,0 +1,63 @@
+<div class="page_warp">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="query_warp">
+      <span>创建时间：</span>
+      <nz-range-picker [(ngModel)]="dateRange"></nz-range-picker>&nbsp;&nbsp;&nbsp;&nbsp;
+      <button nz-button nzType="primary" (click)="search()">查询</button>
+      <button nz-button nzType="default" (click)="download()" >导出</button>
+    </div>
+    <nz-table class="table_warp" #basicTable [nzData]="tableData" [nzLoading]="loading" [(nzPageIndex)]="q.pageIndex"
+      [(nzTotal)]="q.total" [(nzPageSize)]="q.pageSize" [nzShowSizeChanger]="true" [nzFrontPagination]="false"
+      (nzPageIndexChange)="pageIndexChange($event)" (nzPageSizeChange)="pageSizeChange($event)">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th>序号</th>
+          <th>项目名称</th>
+          <th>项目号</th>
+          <th>费用类型</th>
+          <th>金额(元)</th>
+          <th>备注</th>
+          <th>申请人</th>
+          <th>申请时间</th>
+          <th>审核人</th>
+          <th>审核结果</th>
+          <th>审核时间</th>
+          <th>第二审核人</th>
+          <th>审核结果</th>
+          <th>审核时间</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;index as i">
+          <td>{{i + 1 + ((q.pageIndex-1) * q.pageSize)}}</td>
+          <td>{{data.contract_name}}</td>
+          <td>{{data.contract_num}}</td>
+          <td>{{data.fee_type_str}}</td>
+          <td>{{data.money}}</td>
+          <td>{{data.description}}</td>
+          <td>{{data.applicant.nickname}}</td>
+          <td>{{data.apply_date | date:'yyyy-MM-dd HH:mm'}}</td>
+          <td>{{data.approver.nickname}}</td>
+          <td>{{data.is_approved_str}}</td>
+          <td>{{data.approve_date | date:'yyyy-MM-dd HH:mm'}}</td>
+          <td>{{data.approver2?.nickname}}</td>
+          <td>{{data.is_approved_2_str}}</td>
+          <td>{{data.approve_date_2 | date:'yyyy-MM-dd HH:mm'}}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      各类上报
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      临时费用申请记录
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

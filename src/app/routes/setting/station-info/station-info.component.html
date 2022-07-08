@@ -1,0 +1,1451 @@
+<div class="page_warp" *ngIf="!showAddPage && !showModifyPage">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="query_warp">
+      <!-- <span>所属区域：</span>
+      <input style="width: 200px" nz-input placeholder="请选择" [(ngModel)]="org" />
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span>合同名称：</span>
+      <input style="width: 200px" nz-input placeholder="合同名称或合同编号" [(ngModel)]="instrName" />
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span>站点名称：</span>
+      <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption" (nzOnSearch)="filterStationList($event)"
+        style="width: 200px" [(ngModel)]="stationId" nzAllowClear nzPlaceHolder="请选择">
+        <nz-option *ngFor="let item of allStationList" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+      </nz-select>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span>运维人员：</span>
+      <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption" (nzOnSearch)="filterOpsList($event)"
+        style="width: 200px" [(ngModel)]="opsId" nzAllowClear nzPlaceHolder="请选择">
+        <nz-option *ngFor="let item of opsList" [nzValue]="item.id" [nzLabel]="item.nickname"></nz-option>
+      </nz-select> -->
+
+      <span>站点名称：</span>
+      <input nz-input style="width:200px;" placeholder="请输入站点名称" [(ngModel)]="keyword" />
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span>合同编号：</span>
+      <input nz-input style="width:200px;" placeholder="请输入合同编号/名称" [(ngModel)]="contract" />
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <button nz-button nzType="primary" (click)="search()">查询</button>
+      <button nz-button nzType="default" (click)="add()" *ngIf="userInfo.dataManager || userInfo.manager">新建</button>
+      <button nz-button nzType="primary" (click)="download()"
+        *ngIf="userInfo.dataManager || userInfo.manager">导出</button>
+    </div>
+    <nz-table class="table_warp" #basicTable [nzData]="tableData" [nzLoading]="loading" [(nzPageIndex)]="q.pageIndex"
+      [(nzTotal)]="q.total" [(nzPageSize)]="q.pageSize" [nzShowSizeChanger]="true" [nzFrontPagination]="false"
+      (nzPageIndexChange)="pageIndexChange($event)" (nzPageSizeChange)="pageSizeChange($event)">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th>序号</th>
+          <th>站点名称</th>
+          <th>站点编码</th>
+          <!-- <th>站点类型</th> -->
+          <th>所属区域</th>
+          <!-- <th>合同名称</th>
+          <th>合同编码</th> -->
+          <th>站点状态</th>
+          <th>运维人员</th>
+          <th>数据管理员</th>
+          <!-- <th>运维助理</th> -->
+          <th *ngIf="userInfo.dataManager || userInfo.manager">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;index as i">
+          <td>{{i + 1 + ((q.pageIndex-1) * q.pageSize)}}</td>
+          <td>{{data.name}}</td>
+          <td>{{(data.mn)}}</td>
+          <!-- <td></td> -->
+          <td>{{ data.region + ' - ' + data.city}}</td>
+          <!-- <td></td>
+          <td></td> -->
+          <td>{{data.state ? '启用' : '停用'}}</td>
+          <td>{{data.ops}}</td>
+          <td>{{data.dataManager}}</td>
+          <!-- <td></td> -->
+          <td *ngIf="userInfo.dataManager || userInfo.manager">
+            <a (click)="modify(data.id)">修改</a>
+            <span class="divider"></span>
+            <a (click)="config(data.id)">配置仪器</a>
+            <span class="divider"></span>
+            <a (click)="delete(data.id)">删除</a>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+<!-- 新增 -->
+<div class="page_warp" *ngIf="showAddPage">
+  <nz-page-header (nzBack)="showAddPage=false" nzBackIcon [nzSubtitle]="nzSubtitleAdd"> </nz-page-header>
+  <nz-card>
+    <form nz-form [formGroup]="addDataForm" role="form">
+      <nz-card nzTitle="基本信息">
+        <nz-row>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">站点名称</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">站点编号</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="mn" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">建站日期</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-date-picker style="width:200px;" formControlName="buildDate"></nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">站点状态</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-select style="width: 200px" formControlName="state" nzAllowClear nzPlaceHolder="请选择">
+                  <nz-option [nzValue]="true" nzLabel="启用"></nz-option>
+                  <nz-option [nzValue]="false" nzLabel="停用"></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <!-- <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">水质目标级别</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-select style="width: 200px" formControlName="name" nzAllowClear nzPlaceHolder="请选择">
+                  <nz-option *ngFor="let item of waterLevel" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col> -->
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">管控级别</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-select style="width: 200px" formControlName="controlType" nzAllowClear nzPlaceHolder="请选择">
+                  <nz-option *ngFor="let item of allOriginData.controlType" [nzValue]="item.value"
+                    [nzLabel]="item.label">
+                  </nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">站点类型</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-select style="width: 200px" formControlName="stationType" nzAllowClear nzPlaceHolder="请选择">
+                  <nz-option *ngFor="let item of allOriginData.stationType" [nzValue]="item.value"
+                    [nzLabel]="item.label">
+                  </nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">站点类别</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-select style="width: 200px" formControlName="stationGroup" nzAllowClear nzPlaceHolder="请选择">
+                  <nz-option *ngFor="let item of allOriginData.stationGroup" [nzValue]="item.value"
+                    [nzLabel]="item.label"></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">站房类型</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-select style="width: 200px" formControlName="stationHouse" nzAllowClear nzPlaceHolder="请选择">
+                  <nz-option *ngFor="let item of allOriginData.stationHouse" [nzValue]="item.value"
+                    [nzLabel]="item.label"></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">水域类型</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-select style="width: 200px" formControlName="riverType" nzAllowClear nzPlaceHolder="请选择">
+                  <nz-option *ngFor="let item of allOriginData.riverType" [nzValue]="item.value" [nzLabel]="item.label">
+                  </nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">采水方式</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-select style="width: 200px" formControlName="waterType" nzAllowClear nzPlaceHolder="请选择">
+                  <nz-option *ngFor="let item of allOriginData.waterType" [nzValue]="item.value" [nzLabel]="item.label">
+                  </nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">集成商</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="integrator" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">原运维商</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="operator" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+        </nz-row>
+      </nz-card>
+      <nz-row>
+        <nz-card nzTitle="站点人员">
+          <nz-row>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">运维人员</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                    (nzOnSearch)="filterOpsList($event)" style="width: 200px" formControlName="opsId" nzAllowClear
+                    nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of opsList" [nzValue]="item.id" [nzLabel]="item.nickname">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">数据管理员</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                    (nzOnSearch)="filterDataManageList($event, 2)" style="width: 200px" formControlName="dataManagerId"
+                    nzAllowClear nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of dataManageList" [nzValue]="item.id" [nzLabel]="item.nickname">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">地市负责人</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                    (nzOnSearch)="filterCityManagerList($event)" style="width: 200px" formControlName="opsCityManagerId"
+                    nzAllowClear nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of cityManagerList" [nzValue]="item.id" [nzLabel]="item.nickname">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">省级负责人</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                    (nzOnSearch)="filterRegionManagerList($event)" style="width: 200px"
+                    formControlName="opsRegionManagerId" nzAllowClear nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of regionManagerList" [nzValue]="item.id" [nzLabel]="item.nickname">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">地区负责人</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                    (nzOnSearch)="filterAreaManagerList($event)" style="width: 200px" formControlName="opsAreaManagerId"
+                    nzAllowClear nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of areaManagerList" [nzValue]="item.id" [nzLabel]="item.nickname">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">项目负责人</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                    (nzOnSearch)="filterProjectManagerList($event)" style="width: 200px"
+                    formControlName="opsProjectManagerId" nzAllowClear nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of projectManagerList" [nzValue]="item.id" [nzLabel]="item.nickname">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">运维助理</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                    (nzOnSearch)="filterAssistantList($event)" style="width: 200px" formControlName="assistantId"
+                    nzAllowClear nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of assistantList" [nzValue]="item.id" [nzLabel]="item.nickname">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+        <nz-card nzTitle="站点位置">
+          <nz-row>
+            <nz-col [nzSm]="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">省份</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                  <nz-select style="width: 200px" (ngModelChange)="provinceChange($event)" formControlName="province"
+                    nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">城市</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                  <nz-select style="width: 200px" formControlName="city" (ngModelChange)="cityChange($event)"
+                    nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of areaData.city" [nzValue]="item.key" [nzLabel]="item.title">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">区域</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                  <nz-select style="width: 200px" formControlName="districtKey" nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of areaData.area" [nzValue]="item.key" [nzLabel]="item.title">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <!-- <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">所属流域</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                  <nz-select style="width: 200px" formControlName="name" nzAllowClear nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of []" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col> -->
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">经度</nz-form-label>
+                <nz-form-control nzSpan="18" [nzErrorTip]="errorTpl">
+                  <nz-input-number style="width:200px;" formControlName="coordinate1" nzPlaceHolder="请输入">
+                  </nz-input-number>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">纬度</nz-form-label>
+                <nz-form-control nzSpan="18" [nzErrorTip]="errorTpl">
+                  <nz-input-number style="width:200px;" formControlName="coordinate2" nzPlaceHolder="请输入">
+                  </nz-input-number>
+                  <button style="margin-left: 20px;" nz-button nzType="default" (click)="getPosition()">地图选址</button>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">站点地址</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="address" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+        <nz-card nzTitle="站点车辆">
+          <nz-row>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">车牌号</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="carNum" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <!-- <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">车型</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">车辆负责人</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                    (nzOnSearch)="filterManageList($event)" style="width: 200px" formControlName="name" nzAllowClear
+                    nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of []" [nzValue]="item.id" [nzLabel]="item.name">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col> -->
+          </nz-row>
+        </nz-card>
+        <nz-card nzTitle="水费">
+          <nz-row>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">户名</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="payWaterName" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">账号</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="payWaterAccount" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">缴费方式</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-select style="width: 200px" formControlName="payWaterMethod" nzAllowClear nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of allOriginData.payMethod" [nzValue]="item.value"
+                      [nzLabel]="item.label">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+        <nz-card nzTitle="电费">
+          <nz-row>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">户名</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="payElectricName" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">账号</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="payElectricAccount" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">缴费方式</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-select style="width: 200px" formControlName="payElectricMethod" nzAllowClear nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of allOriginData.payMethod" [nzValue]="item.value"
+                      [nzLabel]="item.label">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+        <nz-card nzTitle="网费">
+          <nz-row>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">户名</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="payNetName" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">账号</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="payNetAccount" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">缴费方式</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-select style="width: 200px" formControlName="payNetMethod" nzAllowClear nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of allOriginData.payMethod" [nzValue]="item.value"
+                      [nzLabel]="item.label">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">网络类型</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-select style="width: 200px" formControlName="wireless" nzAllowClear nzPlaceHolder="请选择">
+                    <nz-option [nzValue]="true" nzLabel="无线"> </nz-option>
+                    <nz-option [nzValue]="false" nzLabel="有线"> </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+      </nz-row>
+    </form>
+    <div>
+      <nz-row>
+        <nz-col nzSpan="2">
+        </nz-col>
+        <nz-col nzSpan="22">
+          <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="saveNewData()">保存</button>
+        </nz-col>
+      </nz-row>
+    </div>
+  </nz-card>
+</div>
+<!-- 配置 -->
+<div class="page_warp" *ngIf="showModifyPage">
+  <nz-page-header (nzBack)="showModifyPage=false" nzBackIcon [nzSubtitle]="nzSubtitleModify">
+  </nz-page-header>
+  <nz-card>
+    <nz-tabset>
+      <nz-tab nzTitle="基本信息">
+        <form nz-form [formGroup]="modifyDataForm" role="form">
+          <nz-card nzTitle="基本信息">
+            <nz-row>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzSpan="6">站点名称</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzSpan="6">站点编号</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <input style="width:200px;" nz-input placeholder="请输入" formControlName="mn" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzSpan="6">站点类型</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                    <nz-select style="width: 200px" formControlName="stationType" nzAllowClear nzPlaceHolder="请选择">
+                      <nz-option *ngFor="let item of allOriginData.stationType" [nzValue]="item.value"
+                        [nzLabel]="item.label">
+                      </nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzSpan="6">站点类别</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                    <nz-select style="width: 200px" formControlName="stationGroup" nzAllowClear nzPlaceHolder="请选择">
+                      <nz-option *ngFor="let item of allOriginData.stationGroup" [nzValue]="item.value"
+                        [nzLabel]="item.label"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">站点状态</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                    <nz-select style="width: 200px" formControlName="state" nzAllowClear nzPlaceHolder="请选择">
+                      <nz-option [nzValue]="true" nzLabel="启用"></nz-option>
+                      <nz-option [nzValue]="false" nzLabel="停用"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">建站日期</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <nz-date-picker style="width:200px;" formControlName="buildDate"></nz-date-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <!-- <nz-col nzSpan="8">
+                    <nz-form-item>
+                      <nz-form-label nzRequired nzSpan="6">水质目标级别</nz-form-label>
+                      <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                        <nz-select style="width: 200px" formControlName="name" nzAllowClear nzPlaceHolder="请选择">
+                          <nz-option *ngFor="let item of waterLevel" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+                        </nz-select>
+                      </nz-form-control>
+                    </nz-form-item>
+                  </nz-col> -->
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">管控级别</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                    <nz-select style="width: 200px" formControlName="controlType" nzAllowClear nzPlaceHolder="请选择">
+                      <nz-option *ngFor="let item of allOriginData.controlType" [nzValue]="item.value"
+                        [nzLabel]="item.label">
+                      </nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">站房类型</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                    <nz-select style="width: 200px" formControlName="stationHouse" nzAllowClear nzPlaceHolder="请选择">
+                      <nz-option *ngFor="let item of allOriginData.stationHouse" [nzValue]="item.value"
+                        [nzLabel]="item.label"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">水域类型</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                    <nz-select style="width: 200px" formControlName="riverType" nzAllowClear nzPlaceHolder="请选择">
+                      <nz-option *ngFor="let item of allOriginData.riverType" [nzValue]="item.value"
+                        [nzLabel]="item.label">
+                      </nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">采水方式</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                    <nz-select style="width: 200px" formControlName="waterType" nzAllowClear nzPlaceHolder="请选择">
+                      <nz-option *ngFor="let item of allOriginData.waterType" [nzValue]="item.value"
+                        [nzLabel]="item.label">
+                      </nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">集成商</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <input style="width:200px;" nz-input placeholder="请输入" formControlName="integrator" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">原运维商</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <input style="width:200px;" nz-input placeholder="请输入" formControlName="operator" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+            </nz-row>
+          </nz-card>
+          <nz-row>
+            <nz-card nzTitle="站点人员">
+              <nz-row>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">运维人员</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                        (nzOnSearch)="filterOpsList($event)" style="width: 200px" formControlName="opsId" nzAllowClear
+                        nzPlaceHolder="请选择">
+                        <nz-option *ngFor="let item of opsList" [nzValue]="item.id" [nzLabel]="item.nickname">
+                        </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">数据管理员</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                        (nzOnSearch)="filterDataManageList($event, 2)" style="width: 200px"
+                        formControlName="dataManagerId" nzAllowClear nzPlaceHolder="请选择">
+                        <nz-option *ngFor="let item of dataManageList" [nzValue]="item.id" [nzLabel]="item.nickname">
+                        </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">地市负责人</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                        (nzOnSearch)="filterCityManagerList($event)" style="width: 200px"
+                        formControlName="opsCityManagerId" nzAllowClear nzPlaceHolder="请选择">
+                        <nz-option *ngFor="let item of cityManagerList" [nzValue]="item.id" [nzLabel]="item.nickname">
+                        </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">省级负责人</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                        (nzOnSearch)="filterRegionManagerList($event)" style="width: 200px"
+                        formControlName="opsRegionManagerId" nzAllowClear nzPlaceHolder="请选择">
+                        <nz-option *ngFor="let item of regionManagerList" [nzValue]="item.id" [nzLabel]="item.nickname">
+                        </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">地区负责人</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                        (nzOnSearch)="filterAreaManagerList($event)" style="width: 200px"
+                        formControlName="opsAreaManagerId" nzAllowClear nzPlaceHolder="请选择">
+                        <nz-option *ngFor="let item of areaManagerList" [nzValue]="item.id" [nzLabel]="item.nickname">
+                        </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">项目负责人</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                        (nzOnSearch)="filterProjectManagerList($event)" style="width: 200px"
+                        formControlName="opsProjectManagerId" nzAllowClear nzPlaceHolder="请选择">
+                        <nz-option *ngFor="let item of projectManagerList" [nzValue]="item.id"
+                          [nzLabel]="item.nickname">
+                        </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">运维助理</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                        (nzOnSearch)="filterAssistantList($event)" style="width: 200px" formControlName="assistantId"
+                        nzAllowClear nzPlaceHolder="请选择">
+                        <nz-option *ngFor="let item of assistantList" [nzValue]="item.id" [nzLabel]="item.nickname">
+                        </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+              </nz-row>
+            </nz-card>
+            <nz-card nzTitle="站点位置">
+              <nz-row>
+                <nz-col [nzSm]="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">省份</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                      <nz-select style="width: 200px" (ngModelChange)="provinceChange($event)"
+                        formControlName="province" nzPlaceHolder="请选择">
+                        <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title">
+                        </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">城市</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                      <nz-select style="width: 200px" formControlName="city" (ngModelChange)="cityChange($event)"
+                        nzPlaceHolder="请选择">
+                        <nz-option *ngFor="let item of areaData.city" [nzValue]="item.key" [nzLabel]="item.title">
+                        </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">区域</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                      <nz-select style="width: 200px" formControlName="districtKey" nzPlaceHolder="请选择">
+                        <nz-option *ngFor="let item of areaData.area" [nzValue]="item.key" [nzLabel]="item.title">
+                        </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <!-- <nz-col nzSpan="8">
+                      <nz-form-item>
+                        <nz-form-label nzRequired nzSpan="6">所属流域</nz-form-label>
+                        <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                          <nz-select style="width: 200px" formControlName="name" nzAllowClear nzPlaceHolder="请选择">
+                            <nz-option *ngFor="let item of []" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+                          </nz-select>
+                        </nz-form-control>
+                      </nz-form-item>
+                    </nz-col> -->
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">经度</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-input-number style="width:200px;" formControlName="coordinate1" nzPlaceHolder="请输入">
+                      </nz-input-number>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">纬度</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-input-number style="width:200px;" formControlName="coordinate2" nzPlaceHolder="请输入">
+                      </nz-input-number>
+                      <button style="margin-left: 20px;" nz-button nzType="default"
+                        (click)="getPosition()">地图选址</button>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">站点地址</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <input style="width:200px;" nz-input placeholder="请输入" formControlName="address" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+              </nz-row>
+            </nz-card>
+            <nz-card nzTitle="站点车辆">
+              <nz-row>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">车牌号</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <input style="width:200px;" nz-input placeholder="请输入" formControlName="carNum" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <!-- <nz-col nzSpan="8">
+                      <nz-form-item>
+                        <nz-form-label nzRequired nzSpan="6">车型</nz-form-label>
+                        <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                          <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+                        </nz-form-control>
+                      </nz-form-item>
+                    </nz-col>
+                    <nz-col nzSpan="8">
+                      <nz-form-item>
+                        <nz-form-label nzRequired nzSpan="6">车辆负责人</nz-form-label>
+                        <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                          <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+                            (nzOnSearch)="filterManageList($event)" style="width: 200px" formControlName="name" nzAllowClear
+                            nzPlaceHolder="请选择">
+                            <nz-option *ngFor="let item of []" [nzValue]="item.id" [nzLabel]="item.name">
+                            </nz-option>
+                          </nz-select>
+                        </nz-form-control>
+                      </nz-form-item>
+                    </nz-col> -->
+              </nz-row>
+            </nz-card>
+            <nz-card nzTitle="水费">
+              <nz-row>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">户名</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <input style="width:200px;" nz-input placeholder="请输入" formControlName="payWaterName" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">账号</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <input style="width:200px;" nz-input placeholder="请输入" formControlName="payWaterAccount" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">缴费方式</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-select style="width: 200px" formControlName="payWaterMethod" nzAllowClear nzPlaceHolder="请选择">
+                        <nz-option *ngFor="let item of allOriginData.payMethod" [nzValue]="item.value"
+                          [nzLabel]="item.label">
+                        </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+              </nz-row>
+            </nz-card>
+            <nz-card nzTitle="电费">
+              <nz-row>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">户名</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <input style="width:200px;" nz-input placeholder="请输入" formControlName="payElectricName" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">账号</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <input style="width:200px;" nz-input placeholder="请输入" formControlName="payElectricAccount" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">缴费方式</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-select style="width: 200px" formControlName="payElectricMethod" nzAllowClear
+                        nzPlaceHolder="请选择">
+                        <nz-option *ngFor="let item of allOriginData.payMethod" [nzValue]="item.value"
+                          [nzLabel]="item.label">
+                        </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+              </nz-row>
+            </nz-card>
+            <nz-card nzTitle="网费">
+              <nz-row>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">户名</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <input style="width:200px;" nz-input placeholder="请输入" formControlName="payNetName" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">账号</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <input style="width:200px;" nz-input placeholder="请输入" formControlName="payNetAccount" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">缴费方式</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-select style="width: 200px" formControlName="payNetMethod" nzAllowClear nzPlaceHolder="请选择">
+                        <nz-option *ngFor="let item of allOriginData.payMethod" [nzValue]="item.value"
+                          [nzLabel]="item.label">
+                        </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="6">网络类型</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-select style="width: 200px" formControlName="wireless" nzAllowClear nzPlaceHolder="请选择">
+                        <nz-option [nzValue]="true" nzLabel="无线"> </nz-option>
+                        <nz-option [nzValue]="false" nzLabel="有线"> </nz-option>
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+              </nz-row>
+            </nz-card>
+          </nz-row>
+        </form>
+        <div>
+          <nz-row>
+            <nz-col nzSpan="2">
+            </nz-col>
+            <nz-col nzSpan="22">
+              <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="saveModifyData()">保存</button>
+            </nz-col>
+          </nz-row>
+        </div>
+      </nz-tab>
+      <!-- <nz-tab nzTitle="分析仪器">
+        <button nz-button nzType="primary" (click)="configInstru()">配置仪器</button><br><br>
+        <nz-table class="table_warp" #configList1 [nzData]="instruData">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>仪器名称</th>
+              <th>仪器型号</th>
+              <th>仪器型号</th>
+              <th>仪器厂家</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of configList1.data">
+              <td>{{data.name}}</td>
+              <td>{{data.name}}</td>
+              <td>{{data.name}}</td>
+              <td>{{data.name}}</td>
+              <td>{{data.name}}</td>
+              <td>
+                <a (click)="modifyInstru()">编辑</a>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-tab> -->
+      <!-- <nz-tab nzTitle="辅助设备">
+        <button nz-button nzType="primary" (click)="configHelpInstru()">配置仪器</button><br><br>
+        <nz-table class="table_warp" #configList2 [nzData]="helpInstruData">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>仪器名称</th>
+              <th>仪器型号</th>
+              <th>仪器厂家</th>
+              <th>说明书</th>
+              <th>出厂编号</th>
+              <th>安装时间</th>
+              <th>仪器状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of configList2.data">
+              <td>{{data.name}}</td>
+              <td>{{data.name}}</td>
+              <td>{{data.name}}</td>
+              <td>{{data.name}}</td>
+              <td>{{data.name}}</td>
+              <td>{{data.name}}</td>
+              <td>{{data.name}}</td>
+              <td>{{data.name}}</td>
+              <td>
+                <a (click)="modifyInstru()">编辑</a>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-tab> -->
+      <!-- <nz-tab nzTitle="合同信息">
+        <nz-card>
+          <p><b>合同信息</b></p>
+          <nz-row>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">总站项目合同</nz-form-label>
+                <nz-form-control nzSpan="18">
+                  111
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">合同编号</nz-form-label>
+                <nz-form-control nzSpan="18">
+                  111
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">工程项目经理</nz-form-label>
+                <nz-form-control nzSpan="18">
+                  111
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">合同开始时间</nz-form-label>
+                <nz-form-control nzSpan="18">
+                  111
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">合同结束时间</nz-form-label>
+                <nz-form-control nzSpan="18">
+                  111
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">监测频次</nz-form-label>
+                <nz-form-control nzSpan="18">
+                  111
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+          <p><b>业主信息</b></p>
+          <nz-row>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">业主单位</nz-form-label>
+                <nz-form-control nzSpan="18">
+                  111
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">单位联系人</nz-form-label>
+                <nz-form-control nzSpan="18">
+                  111
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">联系方式</nz-form-label>
+                <nz-form-control nzSpan="18">
+                  111
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+          <p><b></b>运维考核要求</p>
+          <nz-row>
+            <nz-col nzSpan="24">
+              <nz-form-item>
+                <nz-form-control nzSpan="18">
+                  111
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="24">
+              <nz-form-item>
+                <nz-form-control nzSpan="18">
+                  附件：111
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+          <p><b>巡检模板</b></p>
+          <nz-row>
+            <nz-col nzSpan="24">
+              <nz-form-item>
+                <nz-form-control nzSpan="18">
+                  国家站模板&nbsp;&nbsp;&nbsp;<button nz-button nzType="primary">调整</button>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+      </nz-tab> -->
+      <!-- <nz-tab nzTitle="站点图片">
+        <nz-card nzTitle="机柜八方位">
+          <nz-upload nzListType="picture-card" [nzCustomRequest]="fileUpload" [(nzFileList)]="fileList">
+            <i nz-icon nzType="plus"></i>
+            <div class="ant-upload-text">上传</div>
+          </nz-upload>
+        </nz-card>
+        <nz-card nzTitle="站房八方位">
+          <nz-upload nzListType="picture-card" [nzCustomRequest]="fileUpload" [(nzFileList)]="fileList">
+            <i nz-icon nzType="plus"></i>
+            <div class="ant-upload-text">上传</div>
+          </nz-upload>
+        </nz-card>
+        <nz-card nzTitle="仪器单体">
+          <nz-upload nzListType="picture-card" [nzCustomRequest]="fileUpload" [(nzFileList)]="fileList">
+            <i nz-icon nzType="plus"></i>
+            <div class="ant-upload-text">上传</div>
+          </nz-upload>
+        </nz-card>
+        <nz-card nzTitle="各辅助单元">
+          <nz-upload nzListType="picture-card" [nzCustomRequest]="fileUpload" [(nzFileList)]="fileList">
+            <i nz-icon nzType="plus"></i>
+            <div class="ant-upload-text">上传</div>
+          </nz-upload>
+        </nz-card>
+      </nz-tab> -->
+    </nz-tabset>
+  </nz-card>
+</div>
+<!-- 配置仪器 -->
+<nz-modal nzMask="false" class="modal_warp" nzWidth="1100px" [(nzVisible)]="showconfigPage" [nzOkText]="null"
+  [nzCancelText]="null" (nzOnCancel)="showconfigPage=false" [nzTitle]="'配置仪器'">
+  <nz-row [nzGutter]=20>
+    <nz-col nzSpan="6">
+      <span>仪器名称：</span>
+      <input style="width: 60%;" nz-input placeholder="请输入名称" [(ngModel)]="queryName" (ngModelChange)="queryChange()" />
+    </nz-col>
+    <nz-col nzSpan="6">
+      <span>仪器厂家：</span>
+      <nz-select style="width: 60%;" nzAllowClear="true" [(ngModel)]="queryCompany" (ngModelChange)="queryChange()"
+        nzPlaceHolder="请选择">
+        <nz-option *ngFor="let item of instrumentList" [nzValue]="item" [nzLabel]="item">
+        </nz-option>
+      </nz-select>
+    </nz-col>
+    <nz-col nzSpan="6">
+      <span>仪器型号：</span>
+      <input style="width: 60%;" nz-input placeholder="请输入型号" [(ngModel)]="queryVersion"
+        (ngModelChange)="queryChange()" />
+    </nz-col>
+  </nz-row>
+  <nz-row style="margin-top:20px;" [nzGutter]=20>
+    <nz-col nzSpan="11">
+      <span>仪器列表</span>
+      <div class="list_warp">
+        <nz-table class="table_warp" [nzData]="goodsList" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminate" [(nzChecked)]="isAllChecked"
+                (nzCheckedChange)="checkAll($event)"></th>
+              <th nzWidth="10%">序号</th>
+              <th nzWidth="40%">名称</th>
+              <th nzWidth="20%">厂家</th>
+              <th nzWidth="30%">规格</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let data of goodsList;index as i">
+              <tr *ngIf="data.name?.includes(queryName ? queryName : '') &&
+              data.company_str?.includes(queryCompany ? queryCompany:'') &&
+              data.version?.includes(queryVersion ? queryVersion : '') ">
+                <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatus()"></td>
+                <td>{{ i + 1 }}</td>
+                <td>{{ data.name }}</td>
+                <td>{{ data.company_str }}</td>
+                <td>{{ data.version }}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </nz-table>
+      </div>
+    </nz-col>
+    <nz-col nzSpan="2">
+      <div class="btn_warp">
+        <div>
+          <button nz-button nzType="primary" [disabled]="checkedGoods.length === 0" (click)="saveGoods($event)">
+            &gt;&gt;
+          </button>
+          <br><br>
+          <button nz-button nzType="primary" [disabled]="checkedSelectedGoods.length === 0"
+            (click)="deleteGoods($event)">
+            &lt;&lt;
+          </button>
+        </div>
+      </div>
+    </nz-col>
+    <nz-col nzSpan="11">
+      <span>已配列表</span>
+      <div class="list_warp">
+        <nz-table class="table_warp" [nzData]="selectedGoodsList" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminateS" [(nzChecked)]="isAllCheckedS"
+                (nzCheckedChange)="checkAllS($event)"></th>
+              <th nzWidth="10%">序号</th>
+              <th nzWidth="40%">名称</th>
+              <th nzWidth="20%">厂家</th>
+              <th nzWidth="30%">规格</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let data of selectedGoodsList;index as i">
+              <tr>
+                <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatusS()"></td>
+                <td>{{ i + 1 }}</td>
+                <td>{{ data.name }}</td>
+                <td>{{ data.company_str }}</td>
+                <td>{{ data.version }}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </nz-table>
+      </div>
+    </nz-col>
+  </nz-row>
+</nz-modal>
+
+<!-- 编辑仪器/辅助仪器 -->
+<!-- <nz-modal [(nzVisible)]="showModifyInstru" [nzTitle]="'编辑' + '氨氮分析仪'" (nzOnCancel)="showModifyInstru=false"
+  (nzOnOk)="submitModifyInstru">
+  <form *ngIf="showModifyInstru" nz-form [formGroup]="modifyInstruForm" role="form">
+    <nz-row>
+      <nz-col nzSpan="24">
+        <nz-form-item>
+          <nz-form-label nzSpan="6">出厂编号</nz-form-label>
+          <nz-form-control nzSpan="18" nzErrorTip="请输入">
+            <input style="width:300px;" nz-input placeholder="请输入" formControlName="name" />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="24">
+        <nz-form-item>
+          <nz-form-label nzSpan="6">安装时间</nz-form-label>
+          <nz-form-control nzSpan="18" nzErrorTip="请输入">
+            <nz-date-picker style="width:300px;" formControlName="name"></nz-date-picker>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="24">
+        <nz-form-item>
+          <nz-form-label nzSpan="6">仪器状态</nz-form-label>
+          <nz-form-control nzSpan="18" nzErrorTip="请选择">
+            <nz-select style="width: 300px" formControlName="name" nzAllowClear nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of []" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+    </nz-row>
+  </form>
+</nz-modal> -->
+<!-- 配置仪器 -->
+<!-- <nz-modal nzWidth="1000" [(nzVisible)]="showConfigInstru" nzTitle="配置仪器" (nzOnCancel)="showConfigInstru=false"
+  (nzOnOk)="submitConfigInstru">
+  <div style="display: flex;justify-content: center;">
+    <div>
+      <nz-transfer [nzDataSource]="instruList" [nzListStyle]="{ 'width.px': 300, 'height.px': 300 }"
+        (nzSelectChange)="select($event)" (nzChange)="change($event)">
+      </nz-transfer>
+    </div>
+  </div>
+</nz-modal> -->
+<!-- 配置辅助设备 -->
+<!-- <nz-modal nzWidth="1000" [(nzVisible)]="showConfigHelpInstru" nzTitle="配置辅助设备" (nzOnCancel)="showConfigHelpInstru=false"
+  (nzOnOk)="submitConfigHelpInstru">
+  <div style="display: flex;justify-content: center;">
+    <div>
+      <nz-transfer [nzDataSource]="instruList" [nzListStyle]="{ 'width.px': 300, 'height.px': 300 }"
+        (nzSelectChange)="select($event)" (nzChange)="change($event)">
+      </nz-transfer>
+    </div>
+  </div>
+</nz-modal> -->
+<ng-template #errorTpl let-control>
+  <ng-container *ngIf="control.hasError('required')">
+    请输入
+  </ng-container>
+  <ng-container *ngIf="control.hasError('lonOkPattern')">
+    格式错误(经度限制0-180)
+  </ng-container>
+  <ng-container *ngIf="control.hasError('latOkPattern')">
+    格式错误(纬度限制0-90)
+  </ng-container>
+</ng-template>
+
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      站点信息
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleAdd>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      站点信息
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      新增
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleModify>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      站点信息
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      修改
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+
+
+<!-- 地图选址 -->
+<nz-modal nzWidth="80vw" nzMaskClosable="false" [(nzVisible)]="showMapPage" nzTitle="地图定位"
+  (nzOnCancel)="showMapPage=false;" nzTitle="地图选址" [nzFooter]="null" (nzAfterClose)="mapMaskAfterClose()">
+  <div style="position: relative;">
+    <div class="mapAddress">
+      <!-- <nz-select style="width: 200px;" nzShowSearch nzServerSearch nzPlaceHolder="请输入" [(ngModel)]="selectPoint"
+                [nzFilterOption]="nzFilterOption" (nzOnSearch)="searchAddress($event)" (ngModelChange)="getAddress()">
+                <nz-option *ngFor="let item of listAddress" [nzLabel]="item.name" [nzValue]="item"> </nz-option>
+            </nz-select> -->
+      <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
+        <input type="text" nz-input placeholder="请输入地址名称" (change)="stationOnchange($event)" />
+      </nz-input-group>
+      <ng-template #suffixIconButton>
+        <button nz-button nzType="default" nzSearch (click)="stationConfirm()"><i nz-icon nzType="search"></i></button>
+      </ng-template>
+    </div>
+    <div style="width: 100%;height: 70vh;" id="mapContainer"></div>
+    <div class="map-show-tool-con">
+      <div *ngIf="mapPosition.lng; else elseBlock " class="map-msg-show">
+        <p class="text">{{ mapPosition.hotSpot }}</p>
+        <p class="number">{{ mapPosition.lng }}</p>
+        <p class="number">{{ mapPosition.lat }}</p>
+      </div>
+      <ng-template #elseBlock>点图获取坐标</ng-template>
+
+      <div class="map-address-btn-con">
+        <button nz-button nzType="default" (click)="closeShowPage()">取消</button>
+        <button nz-button nzType="primary" (click)="confirmMapStation()" [disabled]="!mapPosition.lng">确定</button>
+      </div>
+    </div>
+
+  </div>
+</nz-modal>

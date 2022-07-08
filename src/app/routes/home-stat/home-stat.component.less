@@ -1,0 +1,131 @@
+#body {
+  //background: url("/assets/tmp/img/screen-bg.jpg");0
+  background-color: white;
+  background-size: cover;
+  background-repeat: no-repeat;
+  /* height: calc(100vh - 64px);
+  overflow: hidden; */
+  //display: flex;
+  //flex-direction: column;
+  //box-sizing: border-box;
+}
+
+.title {
+  flex-basis: 80px;
+  //background: url("/assets/tmp/img/screen-title.svg") no-repeat center -10px;
+}
+
+.body {
+  flex: 1;
+}
+
+.title h1 {
+  text-align: center;
+  //color: #ffffff;
+  color: #0b49b0;
+  font-size: 24px;
+  margin-top: 10px;
+}
+
+.body {
+  display: flex;
+}
+
+.left>div,
+.right>div,
+.center>div,
+.center_bottom>div {
+  //background-image: url("/assets/tmp/img/screen-div-bg.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.left,
+ {
+  flex-basis: 38%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.right,{
+  flex-basis: 58%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.left>div,
+.right>div {
+  flex-basis: 100%;
+}
+
+.center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.center .map {
+  flex: 1;
+  margin-bottom: 20px;
+  background: #fff;
+}
+
+.center .center_bottom {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: space-between;
+
+}
+
+.center_bottom>div {
+  flex-basis: 100%;
+}
+
+
+.figure h3{
+  color:#2bc9fc;
+  height: 30px;
+  line-height: 30px;
+  font-size: 20px;
+}
+
+.leftcard{
+  margin-left: 20px;
+}
+// #board {
+//   width: 100%;
+//   padding: 0 15px;
+//   box-sizing: border-box;
+//   min-width: 1366px;
+// }
+
+
+// .figure {
+//   color: #fff;
+//   padding: 15px 35px !important;
+//   width: 100%;
+//   height: 312px;
+//   content: "";
+//   background-image: url("/assets/tmp/img/screen-div-bg.png");
+//   background-repeat: no-repeat;
+//   background-size: 100% 100%;
+//   transition: background-image .5s;
+//   -o-transition: background-image .5s;
+//   -webkit-transition: background-image .5s;
+//   -moz-transition: background-image .5s;
+//   background-color: red;
+// }
+
+// #map_figure {
+//   width: 100%;
+//   height: 610px;
+//   margin-bottom: 15px;
+//   border-radius: 5px;
+//   overflow: hidden;
+//   position: relative;
+//   z-index: 0;
+//   background-color: rgb(243, 241, 236);
+//   color: rgb(0, 0, 0);
+//   text-align: left;
+// }

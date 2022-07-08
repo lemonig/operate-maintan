@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="748px" height="86px" viewBox="0 0 748 86" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.1 (57501) - http://www.bohemiancoding.com/sketch -->
+    <title>nav_平台标题_底框</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <radialGradient cx="50%" cy="71.1388221%" fx="50%" fy="71.1388221%" r="120.357572%" gradientTransform="translate(0.500000,0.711388),scale(0.090165,1.000000),rotate(-90.000000),scale(1.000000,6.025373),translate(-0.500000,-0.711388)" id="radialGradient-1">
+            <stop stop-color="#0E143D" offset="0%"></stop>
+            <stop stop-color="#003065" offset="100%"></stop>
+        </radialGradient>
+        <filter x="-1.6%" y="-18.2%" width="103.3%" height="136.4%" filterUnits="objectBoundingBox" id="filter-2">
+            <feGaussianBlur stdDeviation="4" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+    </defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="平台标题-" transform="translate(-518.000000, 10.000000)" fill-rule="nonzero">
+            <g id="nav_平台标题_底框">
+                <g>
+                    <g transform="translate(525.000000, 0.000000)">
+                        <path d="M114.128979,65.0915049 L136.203198,54.9376588 L137.038989,56.7546489 L114.964771,66.9084951 L114.128979,65.0915049 Z M601.235447,54.9418327 L622.747165,65.0956789 L621.89346,66.9043211 L600.381741,56.750475 L601.235447,54.9418327 Z M650.975039,65.2237536 L668.548001,50.9518461 L669.80886,52.5043389 L652.235898,66.7762464 L650.975039,65.2237536 Z M64.4435541,49.309449 L84.4313271,65.2175659 L83.1858604,66.7824341 L63.1980873,50.8743172 L64.4435541,49.309449 Z" id="平台标题-cu边-copy-2" stroke="#85B3F7" stroke-width="2" opacity="0.5"></path>
+                        <polygon id="平台标题-底" fill-opacity="0.7" fill="url(#radialGradient-1)" style="mix-blend-mode: multiply;" points="0.8828125 0 83.8085938 66 114.546875 66 136.621094 55.8461538 600.808594 55.8461538 622.320312 66 651.605469 66 732.871094 0"></polygon>
+                        <path d="M600.696519,56.3461538 L136.730577,56.3461538 L114.755823,66.4542475 L114.546875,66.5 L83.6339075,66.5 L-0.548324956,-0.5 L734.279852,-0.5 L651.78293,66.5 L622.320312,66.5 L622.106886,66.4521606 L600.696519,56.3461538 Z" id="平台标题-边" stroke="#85B3F7" opacity="0.6"></path>
+                        <path d="M3.74508741,1 L84.1579662,65 L114.327909,65 L136.402128,54.8461538 L601.032743,54.8461538 L622.544462,65 L651.250546,65 L730.053577,1 L3.74508741,1 Z" id="平台标题-边模糊" stroke="#94C7FF" stroke-width="2" filter="url(#filter-2)"></path>
+                        <path d="M134.882763,66 L601.717237,66 C601.772318,66 601.827305,66.0045508 601.881636,66.0136061 L607.8,67 C608.074251,67.0457085 608.259521,67.3050868 608.213813,67.5793377 C608.173355,67.8220831 607.963331,68 607.717237,68 L128.882763,68 C128.604729,68 128.379338,67.774609 128.379338,67.4965752 C128.379338,67.2504814 128.557255,67.0404576 128.8,67 L134.718364,66.0136061 C134.772695,66.0045508 134.827682,66 134.882763,66 Z" id="Rectangle-3" fill="#85B0F7" opacity="0.595758929"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

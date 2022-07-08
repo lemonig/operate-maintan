@@ -1,0 +1,172 @@
+<!-- <full-content [padding]=0> -->
+<div id="body">
+  <!-- <img
+    src="../../../../assets/tmp/img/index.png"> -->
+  <div class="title">
+    <h1>运维合同概览&nbsp;&nbsp;<nz-year-picker  nzFormat="YYYY"   [(ngModel)]="startYear"  (ngModelChange)="onChangeYear($event)"></nz-year-picker></h1>
+
+  </div>
+    <nz-row [nzGutter]="16">
+    <nz-col [nzSpan]="8">
+        <nz-card nzType="inner" nzTitle="合同年限(年)" >
+        <div class="left_row" echarts [options]="contractTime"  (chartInit)="onChart1($event)" style="height: 430px;"></div>
+        </nz-card>
+    </nz-col>
+    <nz-col [nzSpan]="8">
+        <nz-card nzType="inner" nzTitle="合同包含站点数(个)" >
+        <div class="left_row" echarts [options]="contractStationCountPie" (chartInit)="onChart2($event)" style="height: 430px;"></div>
+        </nz-card>
+    </nz-col>
+    <nz-col [nzSpan]="8">
+        <nz-card nzType="inner" nzTitle="合同运维费用(万元)" >
+        <div class="left_row" echarts [options]="contractMoney" (chartInit)="onChart3($event)" style="height: 430px;"></div>
+        </nz-card>
+    </nz-col>
+    <nz-col [nzSpan]="24" >
+      <!-- <div class="map"></div> -->
+          <nz-card nzType="inner" nzTitle="合同整合" >
+            <nz-row [nzGutter]="16">
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="contractStatistics.contractCount | number" [nzTitle]="'今年累计执行的合同总数'" [nzSuffix]="'个'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="contractStatistics.doContractCount | number" [nzTitle]="'正在执行的合同总数'" [nzSuffix]="'个'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="contractStatistics.nearOverContratCount | number" [nzTitle]="'即将到期的合同总数'" [nzSuffix]="'个'"> </nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="contractStatistics.stationCount | number" [nzTitle]="'今年累计运维的站点个数'" [nzSuffix]="'个'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="contractStatistics.doStationCount | number" [nzTitle]="'正在运维的站点个数'" [nzSuffix]="'个'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="contractStatistics.nearOverStationCount | number" [nzTitle]="'即将到期的站点个数'" [nzSuffix]="'个'"></nz-statistic>
+                </nz-col>
+
+            </nz-row>
+            <nz-row [nzGutter]="16" style = "padding-top: 10px;">
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="contractStatistics.turnover!=null?contractStatistics.turnover:0 | number" [nzTitle]="'流失率'" [nzSuffix]="'%'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="contractStatistics.renewal!=null?contractStatistics.renewal:0 | number" [nzTitle]="'续约率'" [nzSuffix]="'%'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="contractStatistics.oneYearContractNum | number" [nzTitle]="'年度合同金额'" [nzSuffix]="'万元'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="contractStatistics.activeCompanyCout | number" [nzTitle]="'活跃客户数'" [nzSuffix]="'个'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="contractStatistics.lostCompanyCount | number" [nzTitle]="'丢失客户数'" [nzSuffix]="'个'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                    <nz-statistic [nzValue]="contractStatistics.newCompanyCount | number" [nzTitle]="'新签客户数'" [nzSuffix]="'个'"></nz-statistic>
+                    </nz-col>
+            </nz-row>
+
+            </nz-card>
+    </nz-col>
+    <!-- <nz-col [nzSpan]="3">
+       <nz-card nzType="inner" nzTitle="年统计" >
+       <nz-row [nzGutter]="16">
+           <nz-col [nzSpan]="24">
+             <nz-statistic [nzValue]="contractStatistics.activeCompanyCout | number" [nzTitle]="'活跃客户数'" [nzSuffix]="'个'"></nz-statistic>
+           </nz-col>
+           <nz-col [nzSpan]="24">
+             <nz-statistic [nzValue]="contractStatistics.lostCompanyCount | number" [nzTitle]="'丢失客户数'" [nzSuffix]="'个'"></nz-statistic>
+           </nz-col>
+           <nz-col [nzSpan]="24">
+               <nz-statistic [nzValue]="contractStatistics.newCompanyCount | number" [nzTitle]="'新签客户数'" [nzSuffix]="'个'"></nz-statistic>
+               </nz-col>
+       </nz-row>
+       </nz-card>
+    </nz-col> -->
+    <!-- <nz-col [nzSpan]="12">
+      <nz-row [nzGutter]="16">
+
+        <nz-card nzType="inner" nzTitle="合同期饼图" >
+          <nz-tabset>
+                <nz-tab nzTitle="一年及以内">
+                  <div class="left_row" echarts [options]="contractTime" style="height: 200px;"></div>
+                </nz-tab>
+                <nz-tab nzTitle="1~2年">
+                  <div class="left_row" echarts [options]="contractTime" style="height: 200px;"></div>
+                </nz-tab>
+                <nz-tab nzTitle=">2年">
+                <div class="left_row" echarts [options]="contractTime"  style="height: 200px;"></div>
+                </nz-tab>
+              </nz-tabset>
+
+        </nz-card>
+      </nz-row>
+    </nz-col> -->
+    <nz-col [nzSpan]="12" >
+        <nz-card nzType="inner" nzTitle="合同站点省份分布" >
+          <div class="left_row" echarts [options]="doubleBar" style="height: 300px;"></div>
+        </nz-card>
+    </nz-col>
+    <!-- <nz-col [nzSpan]="3">
+       <nz-card nzType="inner" nzTitle="年统计" >
+       <nz-row [nzGutter]="16">
+           <nz-col [nzSpan]="24">
+             <nz-statistic [nzValue]="contractStatistics.activeCompanyCout | number" [nzTitle]="'活跃客户数'" ></nz-statistic>
+           </nz-col>
+           <nz-col [nzSpan]="24">
+             <nz-statistic [nzValue]="contractStatistics.lostCompanyCount | number" [nzTitle]="'丢失客户数'" ></nz-statistic>
+           </nz-col>
+           <nz-col [nzSpan]="24">
+               <nz-statistic [nzValue]="contractStatistics.oneYearContractNum | number" [nzTitle]="'年度合同金额'"></nz-statistic>
+               </nz-col>
+       </nz-row>
+       </nz-card>
+    </nz-col> -->
+
+    <nz-col [nzSpan]="12" >
+      <nz-card nzType="inner" nzTitle="各个合同的站点数" >
+        <div class="left_row" echarts [options]="chartPiepolice" style="height: 300px;"></div>
+      </nz-card>
+    </nz-col>
+
+    <!-- <nz-col [nzSpan]="12" >
+      <nz-card nzType="inner" nzTitle="业主单位的合同列表" >
+        <div class="left_row" echarts [options]="companyContract" style="height: 300px;"></div>
+      </nz-card>
+    </nz-col> -->
+    </nz-row>
+   <!-- <div nz-row [nzGutter]="24" class="pt-lg">
+        <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24" id="title">
+            <h1>绿洁运维管理平台</h1>
+        </div>
+    </div>
+
+    <div nz-row [nzGutter]="24" class="pt-lg" id="board">
+        <div nz-col nzXs="6" nzSm="6" nzMd="6" nzLg="6">
+            <div class="figure">aaaaa</div>
+            <div class="figure">aaaaa</div>
+            <div class="figure">aaaaa</div>
+        </div>
+        <div nz-col nzXs="12" nzSm="12" nzMd="12" nzLg="12">
+            <div id="map_figure">aaaaa</div>
+            <div class="figure">aaaaa</div>
+        </div>
+        <div nz-col nzXs="6" nzSm="6" nzMd="6" nzLg="6">
+            <div class="figure">aaaaa</div>
+            <div class="figure">aaaaa</div>
+            <div class="figure">aaaaa</div>
+        </div>
+    </div> -->
+</div>
+
+
+
+
+
+
+
+
+
+
+<!-- </full-content> -->

@@ -1,0 +1,480 @@
+<div class="page_warp" *ngIf="!showModifyPage && !showDetailPage">
+  <nz-card>
+    <div class="query_warp">
+      <div class="searchItem itemSpace">
+        <span>任务预警：</span>
+        <nz-select style="width: 200px" [(ngModel)]="active" nzAllowClear nzPlaceHolder="请选择">
+          <nz-option [nzValue]="" nzLabel="全部"></nz-option>
+          <nz-option [nzValue]="1" nzLabel="即将超时"></nz-option>
+          <nz-option [nzValue]="2" nzLabel="已超时"></nz-option>
+          <nz-option [nzValue]="3" nzLabel="即将超时+已超时"></nz-option>
+        </nz-select>
+      </div>
+      <div class="searchItem itemSpace">
+        <span>省份：</span>
+
+        <nz-select style="width: 200px" [(ngModel)]="orgKey" nzAllowClear nzPlaceHolder="请选择"
+          (ngModelChange)="handleProvinceChange($event)">
+          <nz-option *ngFor="let item of regionList" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+        </nz-select>
+      </div>
+      <div class="searchItem itemSpace">
+        <span>城市：</span>
+
+        <nz-select style="width: 200px" [(ngModel)]="cityKey" nzAllowClear nzPlaceHolder="请选择">
+          <nz-option *ngFor="let item of cityList" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+        </nz-select>
+      </div>
+
+      <div class="searchItem itemSpace">
+        <span>任务创建时间：</span>
+        <nz-range-picker [(ngModel)]="dateRange"></nz-range-picker>
+      </div>
+
+      <div class="searchItem itemSpace">
+        <span>任务状态：</span>
+        <nz-select style="width: 200px" [(ngModel)]="status" nzAllowClear nzPlaceHolder="请选择">
+          <nz-option [nzValue]="1" nzLabel="待处理"></nz-option>
+          <nz-option [nzValue]="2" nzLabel="处理中"></nz-option>
+          <nz-option [nzValue]="3" nzLabel="已修复"></nz-option>
+          <nz-option [nzValue]="4" nzLabel="非异常"></nz-option>
+          <nz-option [nzValue]="5" nzLabel="已关闭"></nz-option>
+          <nz-option [nzValue]="6" nzLabel="已终止"></nz-option>
+        </nz-select>
+      </div>
+
+      <div class="searchItem itemSpace">
+        <span>运维人员：</span>
+        <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption" (nzOnSearch)="filterOpsList($event)"
+          style="width: 200px" [(ngModel)]="executorId" nzAllowClear nzPlaceHolder="请选择">
+          <nz-option *ngFor="let item of opsList" [nzValue]="item.id" [nzLabel]="item.nickname"></nz-option>
+        </nz-select>
+      </div>
+      <div class="searchItem itemSpace">
+        <span>站点名称：</span>
+        <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+          (nzOnSearch)="filterStationList($event)" style="width: 200px" [(ngModel)]="stationId" nzAllowClear
+          nzPlaceHolder="请选择" (click)="getStationList()">
+          <nz-option *ngFor="let item of allStationList" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+        </nz-select>
+      </div>
+      <div class="searchItem itemSpace">
+        <span>阅读情况：</span>
+        <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+          (nzOnSearch)="filterStationList($event)" style="width: 100px" [(ngModel)]="isRead" nzAllowClear
+          nzPlaceHolder="请选择">
+          <nz-option [nzValue]=-1 nzLabel="全部"></nz-option>
+          <nz-option [nzValue]=0 nzLabel="未读"></nz-option>
+          <nz-option [nzValue]=1 nzLabel="已读"></nz-option>
+        </nz-select>
+      </div>
+      <div class="searchItem itemSpace">
+        <span>业务类型：</span>
+        <nz-select nzShowSearch nzServerSearch style="width: 100px" [(ngModel)]="bizType" nzAllowClear
+          nzPlaceHolder="请选择">
+          <nz-option [nzValue]="" nzLabel="全部"></nz-option>
+          <nz-option [nzValue]=1 nzLabel="水"></nz-option>
+          <nz-option [nzValue]=2 nzLabel="气"></nz-option>
+        </nz-select>
+      </div>
+      <div class="searchItem itemSpace">
+        <button nz-button nzType="primary" (click)="search()">查询</button>
+        <button nz-button nzType="default" (click)="download()">导出</button>
+      </div>
+    </div>
+    <nz-table class="table_warp" #basicTable [nzData]="tableData" [nzLoading]="loading" [(nzPageIndex)]="q.pageIndex"
+      [(nzTotal)]="q.total" [(nzPageSize)]="q.pageSize" [nzShowSizeChanger]="true" [nzFrontPagination]="false"
+      (nzPageIndexChange)="pageIndexChange($event)" (nzPageSizeChange)="pageSizeChange($event)">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th>序号</th>
+          <th>站点名称</th>
+          <th>省份</th>
+          <th>城市</th>
+          <th>异常现象</th>
+          <th>创建时间</th>
+          <th>创建人</th>
+          <th>任务状态</th>
+          <th>运维人员</th>
+          <th>接受时间</th>
+          <th>完成时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;index as i">
+          <td>{{i + 1 + ((q.pageIndex-1) * q.pageSize)}}</td>
+          <td>{{data.stationName}}</td>
+          <td>{{(data.regionTitle ? data.regionTitle : '') }}</td>
+          <td>{{(data.cityTitle ? data.cityTitle : '')}}</td>
+          <td>{{data.content}}</td>
+          <td>{{data.startTime | date:'yyyy-MM-dd HH:mm'}}</td>
+          <td>{{data.creatorName}}</td>
+          <td>
+            <span *ngIf="data.state == 1">待处理</span>
+            <span *ngIf="data.state == 2">处理中</span>
+            <span *ngIf="data.state == 3">已修复</span>
+            <span *ngIf="data.state == 4">非异常</span>
+            <span *ngIf="data.state == 5">已关闭</span>
+          </td>
+          <td>{{data.executorName}}</td>
+          <td>{{data.receiveTime | date:'yyyy-MM-dd HH:mm'}}</td>
+          <td>{{data.endTime | date:'yyyy-MM-dd HH:mm'}}</td>
+          <td>
+            <ng-container *ngIf="data.isThisStationDataManager && data.editable">
+              <a (click)="modify(data.taskId)">编辑</a>
+              <span class="divider"></span>
+            </ng-container>
+            <ng-container *ngIf="data.isThisStationDataManager && (data.state == 3 || data.state == 4)">
+              <a (click)="confirm(data.taskId)">确认修复</a>
+              <span class="divider"></span>
+            </ng-container>
+            <a (click)="detail(data.taskId)">详情</a>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+
+<!-- 确认修复 -->
+<nz-modal nzMask="false" [(nzVisible)]="showConfirmPage" nzTitle="确认修复" (nzOnCancel)="showConfirmPage=false"
+  (nzOnOk)="confirmSubmit()" [nzOkLoading]="btnLoading">
+  <nz-row>
+    <nz-col nzSpan="24">
+      <nz-form-item>
+        <nz-form-label nzRequired nzXXl="5" nzXl="6" nzLg="7">修复结果</nz-form-label>
+        <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+          <nz-select style="width: 100%" [(ngModel)]="modifyResult" nzAllowClear nzPlaceHolder="请选择">
+            <nz-option [nzValue]="1" nzLabel="已修复"></nz-option>
+            <nz-option [nzValue]="2" nzLabel="未修复"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+    <nz-col nzSpan="24" *ngIf="modifyResult == 2">
+      <nz-form-item>
+        <nz-form-label nzRequired nzXXl="5" nzXl="6" nzLg="7">未修复原因</nz-form-label>
+        <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+          <textarea nz-input placeholder="请输入" [(ngModel)]="rejectReason"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+  </nz-row>
+</nz-modal>
+<!-- 放大图片 -->
+<nz-modal nzWidth="1000" nzMask="false" [(nzVisible)]="showBigImg" nzTitle="图片" [nzCancelText]="null"
+  (nzOnCancel)="showBigImg=false" [nzOkText]="null">
+  <div class="bigImg_warp" *ngIf="showBigImg">
+    <img [src]="bigImgUrl">
+  </div>
+</nz-modal>
+
+<!-- 修改 -->
+<div class="page_warp" *ngIf="showModifyPage">
+  <nz-page-header (nzBack)="showModifyPage=false" nzBackIcon [nzSubtitle]="nzSubtitleModify"> </nz-page-header>
+  <nz-card>
+    <form nz-form [formGroup]="modifyDataForm" role="form">
+      <nz-row>
+        <nz-col nzSpan="24">
+          <nz-form-item>
+            <nz-form-label nzRequired nzXXl="2" nzXl="3" nzLg="4">站点名称</nz-form-label>
+            <nz-form-control nzXXl="19" nzXl="18" nzLg="17" nzErrorTip="请选择">
+              <nz-select style="width: 400px" formControlName="stationId" nzAllowClear nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of stationList" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="24">
+          <nz-form-item>
+            <nz-form-label nzRequired nzXXl="2" nzXl="3" nzLg="4">异常现象</nz-form-label>
+            <nz-form-control nzXXl="19" nzXl="18" nzLg="17" nzErrorTip="请输入">
+              <textarea style="width: 400px" nz-input placeholder="请输入" formControlName="content"></textarea>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="24">
+          <nz-form-item>
+            <nz-form-label nzRequired nzXXl="2" nzXl="3" nzLg="4">现象发生时间</nz-form-label>
+            <nz-form-control nzXXl="19" nzXl="18" nzLg="17" nzErrorTip="请选择">
+              <nz-date-picker nzShowTime class="dateWidth" style="width:400px;" formControlName="gmt_happen"
+                nzPlaceHolder="请选择">
+              </nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="24">
+          <nz-form-item>
+            <nz-form-label nzRequired nzXXl="2" nzXl="3" nzLg="4">任务截止时间</nz-form-label>
+            <nz-form-control nzXXl="19" nzXl="18" nzLg="17" nzErrorTip="请选择">
+              <nz-date-picker nzShowTime class="dateWidth" style="width:400px;" formControlName="deadline"
+                nzPlaceHolder="请选择">
+              </nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="24">
+          <nz-form-item>
+            <nz-form-label nzRequired nzXXl="2" nzXl="3" nzLg="4">提醒</nz-form-label>
+            <nz-form-control nzXXl="19" nzXl="18" nzLg="17" nzErrorTip="请选择">
+              <nz-select style="width: 400px" formControlName="remind" nzAllowClear nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of remindList" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+      </nz-row>
+      <nz-row>
+        <nz-col nzSpan="24">
+          <nz-form-item>
+            <nz-form-label nzXXl="2" nzXl="3" nzLg="4">上传图片</nz-form-label>
+            <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+              <nz-upload nzListType="picture-card" [nzCustomRequest]="fileUpload" [(nzFileList)]="fileList">
+                <i nz-icon nzType="plus"></i>
+                <div class="ant-upload-text">上传</div>
+              </nz-upload>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+      </nz-row>
+    </form>
+    <div>
+      <nz-row>
+        <nz-col nzXXl="2" nzXl="3" nzLg="4">
+        </nz-col>
+        <nz-col nzXXl="19" nzXl="18" nzLg="17">
+          <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="saveModifyData()">保存</button>
+        </nz-col>
+      </nz-row>
+    </div>
+  </nz-card>
+</div>
+<!-- 详情 -->
+<div class="page_warp" *ngIf="showDetailPage">
+  <nz-page-header (nzBack)="showDetailPage=false" nzBackIcon [nzSubtitle]="nzSubtitleDetail"> </nz-page-header>
+  <nz-card nzTitle="基本信息">
+    <nz-row>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">站点名称</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.station}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">所属区域</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{(detailData.region ? detailData.region : '') + (detailData.city ? detailData.city : '')}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">任务来源</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.creator ? detailData.creator.nickname : '系统'}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">异常创建时间</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.gmt_create | date:'yyyy-MM-dd HH:mm'}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">异常发生时间</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.gmt_happen | date:'yyyy-MM-dd HH:mm'}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">任务截止时间</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.deadline | date:'yyyy-MM-dd HH:mm'}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">任务完成时间</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.gmt_solved | date:'yyyy-MM-dd HH:mm'}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">处理用时</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            <ng-container *ngIf="detailData.gmt_solved">
+              {{detailData.timeUsage}}
+            </ng-container>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">处理超时</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            <ng-container *ngIf="!detailData.inTime">
+              {{detailData.timeLeft}}
+            </ng-container>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-row>
+        <nz-col nzSpan="24">
+          <p>异常现象：{{detailData.content}}</p>
+        </nz-col>
+        <nz-col nzSpan="24">
+          <div class="imgWarp">
+            <img *ngFor="let item of detailData.picturesContentPreview" (click)="bigImg(item.url)" [src]="item.url">
+          </div>
+        </nz-col>
+      </nz-row>
+    </nz-row>
+  </nz-card>
+  <nz-card nzTitle="处理过程">
+    <nz-row>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">站点负责人</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.stationAdministrator?.nickname}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">运维人员</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.executor?.nickname}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">转交</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            {{detailData.hadBeenTransfer ? '是': '否'}}
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">异常状态</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            <span *ngIf="detailData.state == 1">待处理</span>
+            <span *ngIf="detailData.state == 2">处理中</span>
+            <span *ngIf="detailData.state == 3">已修复</span>
+            <span *ngIf="detailData.state == 4">非异常</span>
+            <span *ngIf="detailData.state == 5">已关闭</span>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">异常单元</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            <span *ngFor="let item of detailData.instrumentVOList">{{item.name}}</span>
+            <span *ngFor="let item of detailData.errorUnitVOList">{{item.label}}</span>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col nzSpan="8">
+        <nz-form-item>
+          <nz-form-label nzXXl="5" nzXl="6" nzLg="7">提交位置</nz-form-label>
+          <nz-form-control nzXXl="19" nzXl="18" nzLg="17">
+            <ng-container *ngIf="detailData.state != 1">
+              {{detailData.hadArrivedStation ? '站点提交': '离站提交'}}
+            </ng-container>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+    </nz-row>
+    <nz-row>
+      <p>异常原因：{{detailData.reason}}</p>
+      <p>处理过程：{{detailData.solution}}</p>
+      <p>备注：{{detailData.description}}</p>
+      <p>处理前照片：</p>
+      <div class="imgWarp">
+        <img *ngFor="let item of detailData.picturesBeforePreview" (click)="bigImg(item.url)" [src]="item.url">
+      </div>
+      <p class="topSpace">处理中照片：</p>
+      <div class="imgWarp">
+        <img *ngFor="let item of detailData.picturesProcessingPreview" (click)="bigImg(item.url)" [src]="item.url">
+      </div>
+      <p class="topSpace">处理后照片：</p>
+      <div class="imgWarp">
+        <img *ngFor="let item of detailData.picturesAfterPreview" (click)="bigImg(item.url)" [src]="item.url">
+      </div>
+      <p class="topSpace">站房卫生照片：</p>
+      <div class="imgWarp">
+        <img *ngFor="let item of detailData.picturesCleaningPreview" (click)="bigImg(item.url)" [src]="item.url">
+      </div>
+      <p class="topSpace">取水口照片：</p>
+      <div class="imgWarp">
+        <img *ngFor="let item of detailData.picturesWaterIntakePreview" (click)="bigImg(item.url)" [src]="item.url">
+      </div>
+      <p class="topSpace">运维记录照片：</p>
+      <div class="imgWarp">
+        <img *ngFor="let item of detailData.picturesOpsRecordPreview" (click)="bigImg(item.url)" [src]="item.url">
+      </div>
+    </nz-row>
+  </nz-card>
+  <nz-card nzTitle="操作日志">
+    <p *ngFor="let item of processList">
+      <span>{{item.gmt_create | date: 'yyyy-MM-dd HH:mm'}}</span>&nbsp;&nbsp;
+      <span>{{item.user?.nickname}}</span>
+      <span>{{item.content}}</span>
+    </p>
+  </nz-card>
+  <nz-card nzTitle="评论">
+    <p *ngFor="let item of commentList">
+      <span>{{item.gmt_create | date: 'yyyy-MM-dd HH:mm'}}</span>&nbsp;&nbsp;
+      <span>{{item.userCreator?.nickname}}</span>
+      <span>{{item.content}}</span>
+    </p>
+  </nz-card>
+</div>
+
+
+
+<ng-template #nzSubtitleModify>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      异常任务
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      修改
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleDetail>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      异常任务
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      详情
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

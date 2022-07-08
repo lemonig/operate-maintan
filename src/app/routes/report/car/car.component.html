@@ -1,0 +1,61 @@
+<div class="page_warp">
+    <!-- <nz-page-header [nzSubtitle]="车辆使用统计"> </nz-page-header> -->
+    <nz-card>
+      <div class="query_warp">
+        <div class="searchItem itemSpace">
+          <span>统计月份：</span>
+          <nz-month-picker [(ngModel)]="startDate" [nzFormat]="'YYYY-MM'"   nzPlaceHolder="选择月份" ></nz-month-picker>
+
+          <button nz-button nzType="primary" (click)="search()">查询</button>
+          <button nz-button nzType="default" (click)="download()" >导出</button>
+        </div>
+      </div>
+      <nz-table class="table_warp" #basicTable [nzData]="tableData" [nzLoading]="loading" [(nzPageIndex)]="q.pageIndex"
+        [(nzTotal)]="q.total" [(nzPageSize)]="q.pageSize" [nzShowSizeChanger]="true" [nzFrontPagination]="false"
+        (nzPageIndexChange)="pageIndexChange($event)" (nzPageSizeChange)="pageSizeChange($event)">
+        <thead>
+          <tr style="position: relative;" appTableScroll>
+            <th>序号</th>
+            <th>车牌</th>
+            <th>负责人</th>
+            <th>使用公司</th>
+            <th>使用部门</th>
+            <th>省份</th>
+            <th>城市</th>
+            <th>本月实际行驶公里数</th>
+            <th>仪表盘显总公里数</th>
+            <th>加油费</th>
+            <th>路桥费</th>
+            <th>洗车费</th>
+            <th>修车费</th>
+            <th>保养费</th>
+            <th>保险费</th>
+            <th>停车费</th>
+            <th>其他</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of basicTable.data;index as i">
+            <td>{{i + 1 + ((q.pageIndex-1) * q.pageSize)}}</td>
+            <td>{{data.car_num}}</td>
+            <td>{{data.driver}}</td>
+            <td>{{data.company}}</td>
+            <td>{{data.dept}}</td>
+            <td>{{data.region}}</td>
+            <td>{{data.city}}</td>
+            <td>{{data.mileage}}</td>
+            <td>{{data.mileage_total}}</td>
+            <td>{{data.money_oil}}</td>
+            <td>{{data.money_road}}</td>
+            <td>{{data.money_wash}}</td>
+            <td>{{data.money_repair}}</td>
+            <td>{{data.money_maintenance}}</td>
+            <td>{{data.money_insurance}}</td>
+            <td>{{data.money_parking}}</td>
+            <td>{{data.money_other}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </nz-card>
+  </div>
+  

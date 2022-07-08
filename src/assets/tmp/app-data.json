@@ -1,0 +1,278 @@
+{
+  "app": {
+    "name": "Alain",
+    "description": "Ng-zorro admin panel front-end framework",
+    "copy": "杭州绿洁环境科技股份有限公司",
+    "support": "杭州绿洁环境科技股份有限公司",
+    "year": "2019"
+  },
+  "user": {
+    "name": "Admin",
+    "avatar": "./assets/tmp/img/avatar.jpg",
+    "email": "cipchk@qq.com"
+  },
+  "menu": [
+    {
+      "children": [
+        {
+          "text": "首页",
+          "icon": "anticon antanticon anticon-line-chart",
+          "children": [
+            {
+              "text": "运维合同概览",
+              "link": "/home"
+            },
+            {
+              "text": "异常任务概览",
+              "link": "/hometask"
+            }
+          ]
+        },
+        {
+          "text": "异常任务",
+          "icon": "anticon antanticon anticon-profile",
+          "children": [
+            {
+              "text": "列表查询",
+              "link": "/error"
+            },
+            {
+              "text": "异常统计",
+              "link": "/errorStatis"
+            },
+            {
+              "text": "异常绩效统计",
+              "link": "/errorAchievement"
+            }
+          ]
+        },
+        {
+          "text": "巡检任务",
+          "icon": "anticon antanticon anticon-database",
+          "children": [
+            {
+              "text": "列表查询",
+              "link": "/checking"
+            },
+            {
+              "text": "巡检统计",
+              "link": "/checkingStatis"
+            },
+            {
+              "text": "巡检项目",
+              "link": "/setting/plan"
+            },
+            {
+              "text": "巡检项目(新)",
+              "link": "/setting/newplan"
+            },
+            {
+              "text": "巡检模板",
+              "link": "/setting/template"
+            },
+            {
+              "text": "巡检模板(新)",
+              "link": "/setting/newtemplate"
+            },
+            {
+              "text": "巡检绩效统计",
+              "link": "/checkingAchievement"
+            }
+          ]
+        },
+        {
+          "text": "签到记录",
+          "icon": "anticon antanticon anticon-menu",
+          "children": [
+            {
+              "text": "列表查询",
+              "link": "/sign"
+            }
+          ]
+        },
+        {
+          "text": "各类上报",
+          "icon": "anticon antanticon anticon-unordered-list",
+          "children": [
+            {
+              "text": "车辆使用统计",
+              "link": "/report/car"
+            },
+            {
+              "text": "里程上报车辆",
+              "link": "/report/mileageStat"
+            },
+            {
+              "text": "里程绩效统计",
+              "link": "/report/mileageAchievement"
+            },
+            {
+              "text": "车辆里程",
+              "link": "/report/mileage"
+            },
+            {
+              "text": "水电网费用",
+              "link": "/report/stationfee"
+            },
+            {
+              "text": "临时费用申请记录",
+              "link": "/report/snapfee"
+            },
+            {
+              "text": "车辆费用",
+              "link": "/report/carfee"
+            },
+            {
+              "text": "车辆费用统计",
+              "link": "/report/carfeestat"
+            }
+          ]
+        },
+        {
+          "text": "车辆管理",
+          "icon": "anticon antanticon anticon-car",
+          "children": [
+            {
+              "text": "列表查询",
+              "link": "/car/list"
+            },
+            {
+              "text": "地图展示",
+              "link": "/car/map"
+            },
+            {
+              "text": "到站统计",
+              "link": "/car/stat"
+            }
+          ]
+        },
+        {
+          "text": "站点信息",
+          "icon": "anticon antanticon anticon-gold",
+          "children": [
+            {
+              "text": "列表查询",
+              "link": "/setting/stationInfo"
+            }
+          ]
+        },
+        {
+          "text": "合同管理",
+          "icon": "anticon antanticon anticon-rollback",
+          "children": [
+            {
+              "text": "列表查询",
+              "link": "/contract/list"
+            }
+          ]
+        },
+        {
+          "text": "物料库管理",
+          "icon": "anticon antanticon anticon-retweet",
+          "children": [
+            {
+              "text": "分析仪器管理",
+              "link": "/resource/instrument"
+            },
+            {
+              "text": "辅助设备管理",
+              "link": "/resource/device"
+            },
+            {
+              "text": "工具管理",
+              "link": "/resource/tool"
+            },
+            {
+              "text": "试剂清单管理",
+              "link": "/resource/reagent"
+            },
+            {
+              "text": "配件清单管理",
+              "link": "/resource/parts"
+            }
+          ]
+        },
+        {
+          "text": "驻点信息",
+          "icon": "anticon antanticon anticon-snippets",
+          "children": [
+            {
+              "text": "列表查询",
+              "link": "/setting/stagPoint"
+            }
+          ]
+        },
+        {
+          "text": "物料使用管理",
+          "icon": "anticon antanticon anticon-ordered-list",
+          "children": [
+            {
+              "text": "试剂使用记录",
+              "link": "/materials/useRecord"
+            },
+            {
+              "text": "试剂申请记录",
+              "link": "/materials/record"
+            },
+            {
+              "text": "配件使用记录",
+              "link": "/materials/helpUseRecord"
+            },
+            {
+              "text": "配件申请记录",
+              "link": "/materials/helpRecord"
+            }
+          ]
+        },
+        {
+          "text": "用户管理",
+          "icon": "anticon antanticon anticon-user",
+          "children": [
+            {
+              "text": "列表查询",
+              "link": "/setting/user"
+            },
+            {
+              "text": "站点权限",
+              "link": "/setting/dataPower"
+            },
+            {
+              "text": "历史记录",
+              "link": "/setting/history"
+            }
+          ]
+        },
+        {
+          "text": "知识库",
+          "icon": "anticon antanticon anticon-apartment",
+          "children": [
+            {
+              "text": "知识库",
+              "link": "/setting/knowledgeBase"
+            }
+          ]
+        },
+        {
+          "text": "高级权限",
+          "icon": "anticon antanticon anticon-edit",
+          "children": [
+            {
+              "text": "高级权限设置",
+              "link": "/setting/power"
+            }
+          ]
+        },
+        {
+          "text": "预警信息",
+          "icon": "anticon antanticon anticon-clock-circle",
+          "children": [
+            {
+              "text": "预警信息",
+              "link": "/setting/alarm"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

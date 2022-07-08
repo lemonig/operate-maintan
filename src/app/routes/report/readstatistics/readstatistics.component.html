@@ -1,0 +1,116 @@
+
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+  <div class="page_warp" >
+  <div class="searchItem itemSpace">
+    <button nz-button nzType="primary" (click)="search()" [nzLoading]="loading">重置</button>
+  </div>
+  <nz-row >
+
+    <!-- <div  nz-col [nzSm]="3" class="user_btns" *ngFor="let data of readList;index as i">
+      <span nz-col [nzSm]="24" (click)="chooserUser(data.userId)" >名称：<span class="chooser">{{data.userName}}</span></span>
+      <span nz-col [nzSm]="24" >相关异常任务数：<span class="chooser">{{data.taskCount}}</span></span>
+      <span nz-col [nzSm]="24" >已阅异常任务数：<span class="chooser">{{data.taskRead}}</span></span>
+      <span nz-col [nzSm]="24" (click)="goTaskOver(data.userId)">相关异常超时数：<span class="chooser">{{data.overCount}}</span></span>
+      <span nz-col [nzSm]="24" (click)="goOpsRead(data.userId)">相关巡检任务数：<span class="chooser">{{data.opsCount}}</span></span>
+      <span nz-col [nzSm]="24" (click)="goOpsRead(data.userId)">已阅巡检任务数：<span class="chooser">{{data.opsRead}}</span></span>
+    </div> -->
+      高级管理
+      <nz-list [nzDataSource]="managerList" [nzRenderItem]="item" [nzGrid]="{ gutter: 16, span: 4 }" >
+        <ng-template #item let-item>
+          <!-- <nz-list-item [nzContent]="nzContent">
+           <ng-template #nzContent>
+
+           </ng-template>
+          </nz-list-item> -->
+          <nz-card (click)="getReadStatistics(item.id)">
+           <span >{{item.nickname}}</span>
+          </nz-card>
+        </ng-template>
+      </nz-list>
+       <nz-modal [(nzVisible)]="visible" nzTitle="检阅统计" (nzOnCancel)="handleCancel()" nzFooter="" nzWidth="60%">
+            <nz-descriptions nzTitle="" nzBordered>
+                  <nz-descriptions-item nzTitle="名称" [nzSpan]="3">{{readStatistics.userName}}</nz-descriptions-item>
+                  <nz-descriptions-item nzTitle="相关异常任务数" ><span class="chooser" (click)="goTaskRead(readStatistics.userId)">{{readStatistics.taskCount}}</span></nz-descriptions-item>
+                  <nz-descriptions-item nzTitle="已阅异常任务数" ><span class="chooser" (click)="goTaskRead(readStatistics.userId)">{{readStatistics.taskRead}}</span></nz-descriptions-item>
+                  <nz-descriptions-item nzTitle="相关异常超时数：" >
+                    <span class="chooser" (click)="goTaskOver(readStatistics.userId)">{{readStatistics.overCount}}</span>
+                  </nz-descriptions-item>
+                  <nz-descriptions-item nzTitle="相关巡检任务数：" >
+                     <span class="chooser" (click)="goOpsRead(readStatistics.userId)">{{readStatistics.opsCount}}</span>
+                  </nz-descriptions-item>
+                  <nz-descriptions-item nzTitle="已阅巡检任务数：" >
+                    <!-- //<nz-badge nzStatus="processing" nzText="Running"></nz-badge> -->
+                     <span class="chooser" (click)="goOpsRead(readStatistics.userId)">{{readStatistics.opsRead}}</span>
+                  </nz-descriptions-item>
+                </nz-descriptions>
+          </nz-modal>
+
+
+<!--      省级管理员
+      <nz-list [nzDataSource]="regionManagerList" [nzRenderItem]="item" [nzGrid]="{ gutter: 16, span: 6 }">
+            <ng-template #item let-item>
+              <nz-list-item [nzContent]="nzContent">
+                <ng-template #nzContent>
+              <nz-card >
+                {{item.nickname}}
+              </nz-card>
+                </ng-template>
+              </nz-list-item>
+            </ng-template>
+      </nz-list>
+      市级管理员
+      <nz-list [nzDataSource]="cityManagerList" [nzRenderItem]="item" [nzGrid]="{ gutter: 16, span: 6 }">
+            <ng-template #item let-item>
+              <nz-list-item [nzContent]="nzContent">
+                <ng-template #nzContent>
+              <nz-card >
+                {{item.nickname}}
+              </nz-card>
+                </ng-template>
+              </nz-list-item>
+
+            </ng-template>
+      </nz-list>
+      数据管理员
+      <nz-list [nzDataSource]="dataManagerList" [nzRenderItem]="item" [nzGrid]="{ gutter: 16, span: 6 }">
+            <ng-template #item let-item>
+              <nz-list-item [nzContent]="nzContent">
+                <ng-template #nzContent>
+              <nz-card >
+                {{item.nickname}}
+              </nz-card>
+                </ng-template>
+              </nz-list-item>
+
+            </ng-template>
+      </nz-list>
+      运维人员
+          <nz-list [nzDataSource]="opsList" [nzRenderItem]="item" [nzGrid]="{ gutter: 16, span: 6 }">
+                <ng-template #item let-item>
+                  <nz-list-item [nzContent]="nzContent">
+                    <ng-template #nzContent>
+                  <nz-card >
+                    {{item.nickname}}
+                  </nz-card>
+                    </ng-template>
+                  </nz-list-item>
+                </ng-template>
+          </nz-list> -->
+
+  </nz-row>
+
+</div>
+</nz-card>
+
+<ng-template #nzSubtitle>
+   <nz-breadcrumb nzSeparator=">">
+     <span class="CPosition">当前位置 :</span>
+     <nz-breadcrumb-item>
+       统计信息
+     </nz-breadcrumb-item>
+     <nz-breadcrumb-item>
+       检阅统计
+     </nz-breadcrumb-item>
+   </nz-breadcrumb>
+ </ng-template>

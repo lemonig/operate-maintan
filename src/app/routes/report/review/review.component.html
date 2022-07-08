@@ -1,0 +1,89 @@
+
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="page_warp" >
+   <div class="query_warp">
+        <span>查询时间：</span>
+        <nz-range-picker [(ngModel)]="dateRange"></nz-range-picker>
+        &nbsp;&nbsp;
+        <span>所属省份：</span>
+        <!-- <nz-tree-select style="width: 200px" [nzNodes]="orgNodes" nzPlaceHolder="请选择" [(ngModel)]="org">
+        </nz-tree-select> -->
+        <nz-select style="width: 200px" [(ngModel)]="orgKey" nzAllowClear nzPlaceHolder="请选择">
+          <nz-option *ngFor="let item of regionList" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+        </nz-select>
+        &nbsp;&nbsp;
+        <span>姓名：</span>
+        <!-- <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption" (nzOnSearch)="filterOpsList($event)"
+          style="width: 200px" [(ngModel)]="executorId" nzAllowClear nzPlaceHolder="请选择">
+          <nz-option *ngFor="let item of opsList" [nzValue]="item.id" [nzLabel]="item.nickname"></nz-option>
+        </nz-select> -->
+        <input class="itemSpace" nz-input style="width:200px;" placeholder="请输入人员姓名" [(ngModel)]="nickname" />
+        &nbsp;&nbsp;
+          <div nz-row>
+            <nz-checkbox-group [(ngModel)]="powerList" (ngModelChange)="log($event)">
+            </nz-checkbox-group>
+          </div>
+      <button  nz-button nzType="primary" (click)="search()" [nzLoading]="loadingBtn">查询</button>
+      <button  nz-button nzType="primary" (click)="export()" >导出</button>
+    </div>
+
+      <nz-table class="table_warp" #basicTable [nzData]="readList" [nzLoading]="loading" [(nzPageIndex)]="q.pageIndex"
+      [(nzTotal)]="q.total" [(nzPageSize)]="q.pageSize" [nzShowSizeChanger]="true" [nzFrontPagination]="false"
+      (nzPageIndexChange)="pageIndexChange($event)" (nzPageSizeChange)="pageSizeChange($event)" >
+
+        <thead>
+          <tr style="position: relative;" appTableScroll>
+            <th >序号</th>
+            <th>名称</th>
+            <th >相关异常任务数</th>
+            <th >相关异常任务已读数</th>
+            <th >相关异常超时数</th>
+            <th >已完成巡检任务数</th>
+            <th >已完成巡检任务已读数</th>
+            <th >未完成巡检任务数</th>
+            <th >未完成巡检任务已读数</th>
+          </tr>
+        </thead>
+        <tbody >
+          <tr *ngFor="let data of basicTable.data;index as i">
+             <td >{{i + 1 + ((pageIndex-1) * 20)}}</td>
+            <td>{{data.userName}}</td>
+            <td ><span class="chooser" (click)="goTaskCount(data.userId)" >{{data.taskCount?data.taskCount:0}}</span></td>
+            <td><span class="chooser" (click)="goTaskRead(data.userId)">
+             <nz-progress
+                  [nzPercent]="data.taskPercentage"
+                  [nzStrokeColor]="{ '0%': '#108ee9', '100%': '#87d068' }"
+                  nzStatus="active"
+                ></nz-progress></span></td>
+            <td ><span class="chooser" (click)="goTaskRead(data.userId)">{{data.overCount?data.overCount:0}}</span></td>
+            <td ><span class="chooser" (click)="goOpsRead(data.userId)">{{data.opsFinishCount?data.opsFinishCount:0}}</span></td>
+            <td><span class="chooser" (click)="goOpsRead(data.userId)"><nz-progress
+                  [nzPercent]="data.opsFinishPercentage"
+                  [nzStrokeColor]="{ '0%': '#108ee9', '100%': '#87d068' }"
+                  nzStatus="active"
+                ></nz-progress></span></td>
+            <td ><span class="chooser" (click)="goOpsRead(data.userId)">{{data.opsCount?data.opsCount:0}}</span></td>
+            <td><span class="chooser" (click)="goOpsRead(data.userId)"><nz-progress
+                  [nzPercent]="data.opsPercentage"
+                  [nzStrokeColor]="{ '0%': '#108ee9', '100%': '#87d068' }"
+                  nzStatus="active"
+                ></nz-progress></span></td>
+          </tr>
+        </tbody>
+      </nz-table>
+  </div>
+  </nz-card>
+
+
+<ng-template #nzSubtitle>
+   <nz-breadcrumb nzSeparator=">">
+     <span class="CPosition">当前位置 :</span>
+     <nz-breadcrumb-item>
+       统计信息
+     </nz-breadcrumb-item>
+     <nz-breadcrumb-item>
+       检阅统计
+     </nz-breadcrumb-item>
+   </nz-breadcrumb>
+ </ng-template>

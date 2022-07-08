@@ -1,0 +1,130 @@
+<div class="page_warp">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="query_warp">
+      <span>创建时间：</span>
+      <nz-range-picker [(ngModel)]="dateRange"></nz-range-picker>&nbsp;&nbsp;&nbsp;&nbsp;
+      <button nz-button nzType="primary" (click)="search()">查询</button>
+      <button nz-button nzType="default" (click)="download()" >导出</button>
+    </div>
+    <nz-table class="table_warp" #basicTable [nzData]="tableData" [nzLoading]="loading" [(nzPageIndex)]="q.pageIndex"
+      [(nzPageSize)]="q.pageSize" nzBordered [nzScroll]="{x: '2800px'}">
+      <thead>
+        <tr style="position: relative;" appMultiTitleScroll>
+          <th rowspan="2">序号</th>
+          <th rowspan="2">车牌号</th>
+          <th rowspan="2">使用人</th>
+          <th rowspan="2">区域</th>
+          <th rowspan="2">城市</th>
+          <th rowspan="2">项目号</th>
+          <th rowspan="2">项目阶段</th>
+          <th colspan="2">本月使用里程数</th>
+          <th rowspan="2">车辆使用率</th>
+          <th rowspan="2">仪表盘显示总里程</th>
+          <th colspan="2">加油费(现金)</th>
+          <th colspan="2">路桥费(现金)</th>
+          <th colspan="2">洗车费(现金)</th>
+          <th colspan="2">修车费(现金)</th>
+          <th colspan="2">保养费(现金)</th>
+          <th colspan="2">保险费(现金)</th>
+          <th colspan="2">停车费(现金)</th>
+          <th colspan="2">其他费用(现金)</th>
+          <th colspan="2">合计</th>
+        </tr>
+        <tr>
+          <th>分项目实际行驶里程</th>
+          <th>合计</th>
+          <th>分项目</th>
+          <th>合计</th>
+          <th>分项目</th>
+          <th>合计</th>
+          <th>分项目</th>
+          <th>合计</th>
+          <th>分项目</th>
+          <th>合计</th>
+          <th>分项目</th>
+          <th>合计</th>
+          <th>分项目</th>
+          <th>合计</th>
+          <th>分项目</th>
+          <th>合计</th>
+          <th>分项目</th>
+          <th>合计</th>
+          <th>分项目</th>
+          <th>合计</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let data of basicTable.data;index as i">
+          <tr *ngFor="let item of data.items;index as idx">
+            <td *ngIf="idx == 0" [attr.rowspan]=" data.items.length">
+              <ng-container>
+                {{i + 1 + ((q.pageIndex-1) * q.pageSize)}}
+              </ng-container>
+            </td>
+            <td *ngIf="idx == 0" [attr.rowspan]=" data.items.length">
+              <ng-container>
+                {{data.car_num}}
+              </ng-container>
+            </td>
+            <td *ngIf="idx == 0" [attr.rowspan]=" data.items.length">
+              <ng-container>
+                {{data.driver}}
+              </ng-container>
+            </td>
+            <td *ngIf="idx == 0" [attr.rowspan]=" data.items.length">
+              <ng-container>
+                {{data.region}}
+              </ng-container>
+            </td>
+            <td *ngIf="idx == 0" [attr.rowspan]=" data.items.length">
+              <ng-container>
+                {{data.city}}
+              </ng-container>
+            </td>
+            <td>{{item.contract_num}}</td>
+            <td>{{item.stage_string}}</td>
+            <td>{{item.cost}}</td>
+            <td *ngIf="idx == 0" [attr.rowspan]=" data.items.length">
+              <ng-container>
+                {{data.cost}}
+              </ng-container>
+            </td>
+            <td>{{item.cost_percentage}}%</td>
+            <td>{{data.mileage}}</td>
+            <td>{{item.money_oil}}</td>
+            <td>{{data.money_oil}}</td>
+            <td>{{item.money_road}}</td>
+            <td>{{data.money_road}}</td>
+            <td>{{item.money_wash}}</td>
+            <td>{{data.money_wash}}</td>
+            <td>{{item.money_repair}}</td>
+            <td>{{data.money_repair}}</td>
+            <td>{{item.money_maintenance}}</td>
+            <td>{{data.money_maintenance}}</td>
+            <td>{{item.money_insurance}}</td>
+            <td>{{data.money_insurance}}</td>
+            <td>{{item.money_parking}}</td>
+            <td>{{data.money_parking}}</td>
+            <td>{{item.money_other}}</td>
+            <td>{{data.money_other}}</td>
+            <td>{{item.money}}</td>
+            <td>{{data.money}}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      各类上报
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      车辆费用统计
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

@@ -1,0 +1,360 @@
+<div class="page_warp">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="user_btns">
+      <span>模板名称：</span>
+      <input class="itemSpace" nz-input style="width:180px;" placeholder="请输入模板名称/合同编号/站点名称" [(ngModel)]="keyword" />
+      <button nz-button nzType="default" (click)="refresh()">查询</button>
+      <button nz-button nzType="primary" (click)="add()" *ngIf="userInfo.dataManager || userInfo.manager">添加</button>
+    </div>
+    <nz-table class="tableData" #basicTable [nzPageSize]="20" [nzData]="tableData" [nzLoading]="loading"
+      [(nzPageIndex)]="pageIndex">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th nzWidth="10%">序号</th>
+          <th nzWidth="20%">模板名称</th>
+          <th nzWidth="20%">下发周期</th>
+          <th nzWidth="20%">间隔天数</th>
+          <th *ngIf="userInfo.dataManager || userInfo.manager">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;index as i">
+          <td>{{i + 1 + ((pageIndex-1) * 20)}}</td>
+          <td>{{data.name}}</td>
+          <td>{{data.assignRateStr}}</td>
+          <td>{{data.intervalDay}}天</td>
+          <td *ngIf="userInfo.dataManager || userInfo.manager">
+            <a (click)="config(data.id)">配置模板</a>
+            <span class="divider"></span>
+            <a (click)="configStation(data.id)">配置站点</a>
+            <span class="divider"></span>
+            <a (click)="modifyData(data.id)">修改</a>
+            <span class="divider"></span>
+            <a (click)="delete(data.id)">删除</a>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+<!-- 新增数据 -->
+<nz-modal nzMask="false" [(nzVisible)]="newDataModal" nzTitle="新增" [nzOkLoading]="isOkLoading"
+  (nzOnCancel)="newDataModal=false" (nzOnOk)="handleNewData()">
+  <form *ngIf="newDataModal" nz-form [formGroup]="addDataForm" (ngSubmit)="handleNewData()" role="form">
+    <nz-row>
+      <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="5">模板名称</nz-form-label>
+          <nz-form-control [nzSm]="19" nzErrorTip="请输入">
+            <input nz-input formControlName="name" placeholder="请输入">
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="5">巡检频次</nz-form-label>
+          <nz-form-control [nzSm]="19" nzErrorTip="请选择">
+            <nz-select formControlName="assignRate" nzAllowClear nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of frequencyList" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="5">间隔时间</nz-form-label>
+          <nz-form-control [nzSm]="19" nzErrorTip="请输入">
+            <nz-input-number style="width:95%" formControlName="intervalDay" nzPlaceHolder="请输入">
+            </nz-input-number>&nbsp;天
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <!-- <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="5">默认模板</nz-form-label>
+          <nz-form-control [nzSm]="19" nzErrorTip="请选择">
+            <nz-select formControlName="name" nzAllowClear nzPlaceHolder="请选择">
+              <nz-option [nzValue]="true" nzLabel="是"></nz-option>
+              <nz-option [nzValue]="false" nzLabel="否"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col> -->
+    </nz-row>
+  </form>
+</nz-modal>
+<!-- 修改数据 -->
+<nz-modal nzMask="false" [(nzVisible)]="modifyDataModal" nzTitle="修改" [nzOkLoading]="isOkLoading"
+  (nzOnCancel)="modifyDataModal=false" (nzOnOk)="handleModifyData()">
+  <form *ngIf="modifyDataModal" nz-form [formGroup]="modifyDataForm" (ngSubmit)="handleModifyData()" role="form">
+    <nz-row>
+      <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="5">模板名称</nz-form-label>
+          <nz-form-control [nzSm]="19" nzErrorTip="请输入">
+            <input nz-input formControlName="name" placeholder="请输入">
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="5">巡检频次</nz-form-label>
+          <nz-form-control [nzSm]="19" nzErrorTip="请选择">
+            <nz-select formControlName="assignRate" nzAllowClear nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of frequencyList" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="5">间隔时间</nz-form-label>
+          <nz-form-control [nzSm]="19" nzErrorTip="请输入">
+            <nz-input-number style="width:95%" formControlName="intervalDay" nzPlaceHolder="请输入">
+            </nz-input-number>&nbsp;天
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <!-- <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="5">默认模板</nz-form-label>
+          <nz-form-control [nzSm]="19" nzErrorTip="请选择">
+            <nz-select formControlName="name" nzAllowClear nzPlaceHolder="请选择">
+              <nz-option [nzValue]="true" nzLabel="是"></nz-option>
+              <nz-option [nzValue]="false" nzLabel="否"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col> -->
+    </nz-row>
+  </form>
+</nz-modal>
+<!-- 配置模板 -->
+<!-- <nz-modal nzMask="false" [(nzVisible)]="showConfigTemplate" nzTitle="配置模板" [nzOkLoading]="isOkLoading"
+  (nzOnCancel)="showConfigTemplate=false" (nzOnOk)="saveAddTem()">
+  <div style="display: flex;justify-content: center;">
+    <div>
+      <nz-transfer [nzTitles]="['未选', '已选']" class="transfer" [nzDataSource]="itemLists" nzShowSearch
+        (nzChange)="change($event)">
+      </nz-transfer>
+    </div>
+  </div>
+</nz-modal> -->
+
+<!-- 配置仪器 -->
+<nz-modal nzMask="false" class="modal_warp" nzWidth="1100px" [(nzVisible)]="showConfigTemplate" [nzOkText]="null"
+  [nzCancelText]="null" (nzOnCancel)="showConfigTemplate=false" [nzTitle]="'配置模板'" [nzOkLoading]="isOkLoading">
+  <nz-row [nzGutter]=20>
+    <nz-col nzSpan="6">
+      <span>项目名称：</span>
+      <input style="width: 60%;" nz-input placeholder="请输入名称" [(ngModel)]="queryName" (ngModelChange)="queryChange()" />
+    </nz-col>
+    <nz-col nzSpan="6">
+      <span>频率：</span>
+      <nz-select style="width: 60%;" nzAllowClear="true" [(ngModel)]="frequency" (ngModelChange)="queryChange()"
+        nzPlaceHolder="请选择">
+        <nz-option nzValue="" nzLabel="全部"></nz-option>
+        <nz-option nzValue="周" nzLabel="周"></nz-option>
+        <nz-option  nzValue="半月" nzLabel="半月"></nz-option>
+        <nz-option  nzValue="月" nzLabel="月"></nz-option>
+        <nz-option  nzValue="半年"nzLabel="半年"></nz-option>
+        <nz-option  nzValue="年" nzLabel="年"></nz-option>
+      </nz-select>
+    </nz-col>
+    <!-- <nz-col nzSpan="6">
+      <span>仪器厂家：</span>
+      <nz-select style="width: 60%;" nzAllowClear="true" [(ngModel)]="queryCompany" (ngModelChange)="queryChange()"
+        nzPlaceHolder="请选择">
+        <nz-option *ngFor="let item of instrumentList" [nzValue]="item" [nzLabel]="item">
+        </nz-option>
+      </nz-select>
+    </nz-col> -->
+  </nz-row>
+  <nz-row style="margin-top:20px;" [nzGutter]=20>
+    <nz-col nzSpan="11">
+      <span>项目列表</span>
+      <div class="list_warp">
+        <nz-table class="table_warp" [nzData]="itemLists" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminateItem" [(nzChecked)]="isAllCheckedItem"
+                (nzCheckedChange)="checkAllItem($event)"></th>
+              <th nzWidth="10%">序号</th>
+              <th nzWidth="20%">所属单元</th>
+              <th nzWidth="30%">名称</th>
+              <th nzWidth="20%">频率</th>
+              <th nzWidth="20%">是否需要照片</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let data of itemLists;index as i">
+              <tr *ngIf="data.direction=='left'">
+                <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatusItem()"></td>
+                <td>{{ i + 1 }}</td>
+                <td>{{ data.categoryTitle }}</td>
+                <td>{{ data.title }}</td>
+                <td>{{ data.frequencyTitle }}</td>
+                <td>{{ data.requirePhoto ? '是':'否'}}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </nz-table>
+      </div>
+    </nz-col>
+    <nz-col nzSpan="2">
+      <div class="btn_warp">
+        <div>
+          <button nz-button nzType="primary" [disabled]="checkedGoods.length === 0" (click)="saveAddTem(1)">
+            &gt;&gt;
+          </button>
+          <br><br>
+          <button nz-button nzType="primary" [disabled]="checkedSelectedGoods.length === 0"
+            (click)="saveAddTem(2)">
+            &lt;&lt;
+          </button>
+        </div>
+      </div>
+    </nz-col>
+    <nz-col nzSpan="11">
+      <span>已配列表</span>
+      <div class="list_warp">
+        <nz-table class="table_warp" [nzData]="itemLists" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminateItemS" [(nzChecked)]="isAllCheckedItemS"
+                (nzCheckedChange)="checkAllItemS($event)"></th>
+              <th nzWidth="10%">序号</th>
+              <th nzWidth="20%">所属单元</th>
+              <th nzWidth="30%">名称</th>
+              <th nzWidth="20%">频率</th>
+              <th nzWidth="20%">是否需要照片</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let data of itemLists;index as i">
+               <tr *ngIf="data.direction=='right'">
+                <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatusItemS()"></td>
+                <td>{{ i + 1 }}</td>
+                <td>{{ data.categoryTitle }}</td>
+                <td>{{ data.title }}</td>
+                <td>{{ data.frequencyTitle }}</td>
+                <td>{{ data.requirePhoto ? '是':'否'}}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </nz-table>
+      </div>
+    </nz-col>
+  </nz-row>
+</nz-modal>
+<!-- 配置站点 -->
+<nz-modal nzMask="false" class="modal_warp" nzWidth="1100px" [(nzVisible)]="showconfigStation" [nzOkText]="null"
+  [nzCancelText]="null" (nzOnCancel)="showconfigStation=false" nzTitle="配置站点">
+  <span>行政规划：</span>
+  <nz-row [nzGutter]=20>
+    <nz-col nzSpan="8">
+      <nz-select style="width: 100%;" [(ngModel)]="province" (ngModelChange)="provinceChange($event)"
+        nzPlaceHolder="请选择">
+        <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+      </nz-select>
+    </nz-col>
+    <nz-col nzSpan="8">
+      <nz-select style="width: 100%;" nzAllowClear="true" [(ngModel)]="city" (ngModelChange)="cityChange($event)"
+        nzPlaceHolder="请选择">
+        <nz-option *ngFor="let item of areaData.city" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+      </nz-select>
+    </nz-col>
+    <nz-col nzSpan="8">
+      <nz-select style="width: 100%;" nzAllowClear="true" [(ngModel)]="area" (ngModelChange)="areaChange($event)"
+        nzPlaceHolder="请选择">
+        <nz-option *ngFor="let item of areaData.area" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+      </nz-select>
+    </nz-col>
+  </nz-row>
+  <nz-row style="margin-top:20px;" [nzGutter]=20>
+    <nz-col nzSpan="11">
+      <span>站点列表</span>
+      <div class="keyword_search">
+        <input nz-input placeholder="输入站点名称/拼音" [(ngModel)]="noSelectKeyword" />
+      </div>
+      <div class="stations_warp">
+        <nz-table [nzData]="stations" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminate" [(nzChecked)]="isAllChecked"
+                (nzCheckedChange)="checkAll($event)"></th>
+              <th nzWidth="10%">序号</th>
+              <th nzWidth="50%">站点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let data of stations;index as i">
+              <tr *ngIf="data.name.includes(noSelectKeyword) ||
+              data.pinyin.includes(noSelectKeyword.toUpperCase()) ||
+              data.jianpin.includes(noSelectKeyword.toUpperCase())">
+                <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatus()"></td>
+                <td>{{ i + 1 }}</td>
+                <td>{{ data.name }}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </nz-table>
+      </div>
+    </nz-col>
+    <nz-col nzSpan="2">
+      <div class="btn_warp">
+        <div>
+          <button nz-button nzType="primary" [disabled]="checkedStation.length === 0" (click)="saveStation($event)">
+            &gt;&gt;
+          </button>
+          <br><br>
+          <button nz-button nzType="primary" [disabled]="checkedStationS.length === 0" (click)="deleteStation($event)">
+            &lt;&lt;
+          </button>
+        </div>
+      </div>
+    </nz-col>
+    <nz-col nzSpan="11">
+      <span>已配站点</span>
+      <div class="keyword_search">
+        <input nz-input placeholder="输入站点名称/拼音" [(ngModel)]="SelectedKeyword" />
+      </div>
+      <div class="stations_warp">
+        <nz-table [nzData]="selectedStations" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminateS" [(nzChecked)]="isAllCheckedS"
+                (nzCheckedChange)="checkAllS($event)"></th>
+              <th nzWidth="10%">序号</th>
+              <th nzWidth="50%">站点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let data of selectedStations;index as i">
+              <tr *ngIf="data.name.includes(SelectedKeyword) ||
+              data.pinyin.includes(SelectedKeyword.toUpperCase()) ||
+              data.jianpin.includes(SelectedKeyword.toUpperCase())">
+                <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatusS()"></td>
+                <td>{{ i + 1 }}</td>
+                <td>{{ data.name }}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </nz-table>
+      </div>
+    </nz-col>
+  </nz-row>
+</nz-modal>
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      巡检任务
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      巡检模板
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

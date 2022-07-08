@@ -1,0 +1,280 @@
+<div class="page_warp" *ngIf="!showAddPage && !showModifyPage && !showRenewalPage">
+  <!-- <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header> -->
+  <nz-card>
+    <div class="query_warp">
+      <div class="searchItem itemSpace">
+        <span>合同预警 ：</span>
+        <nz-select style="width: 200px" [(ngModel)]="active" nzAllowClear nzPlaceHolder="请选择">
+          <nz-option [nzValue]="" nzLabel="全部"></nz-option>
+          <nz-option [nzValue]="1" nzLabel="即将到期"></nz-option>
+          <nz-option [nzValue]="2" nzLabel="到期未处理"></nz-option>
+          <nz-option [nzValue]="3" nzLabel="到期+即将到期"></nz-option>
+        </nz-select>
+      </div>
+
+      <div class="searchItem itemSpace">
+        <span>合同状态：</span>
+        <nz-select style="width: 200px" [(ngModel)]="state" nzAllowClear nzPlaceHolder="请选择">
+          <nz-option [nzValue]="" nzLabel="全部"></nz-option>
+          <nz-option [nzValue]="1" nzLabel="质保中"></nz-option>
+          <nz-option [nzValue]="2" nzLabel="建设中"></nz-option>
+          <nz-option [nzValue]="3" nzLabel="运维中"></nz-option>
+          <nz-option [nzValue]="4" nzLabel="已续签"></nz-option>
+          <nz-option [nzValue]="5" nzLabel="已结束"></nz-option>
+          <nz-option [nzValue]="6" nzLabel="处理中"></nz-option>
+        </nz-select>
+      </div>
+      <div class="searchItem itemSpace">
+        <span>省份：</span>
+
+        <nz-select style="width: 200px" [(ngModel)]="provinceKey" nzAllowClear nzPlaceHolder="请选择">
+          <nz-option *ngFor="let item of regionList" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+        </nz-select>
+      </div>
+      <div class="searchItem itemSpace">
+        <span>省份：</span>
+
+        <nz-select style="width: 200px" [(ngModel)]="provinceKey" nzAllowClear nzPlaceHolder="请选择">
+          <nz-option *ngFor="let item of regionList" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+        </nz-select>
+      </div>
+      <div class="searchItem itemSpace">
+        <span>关键词：</span>
+        <input style="width: 200px" nz-input placeholder="请输入合同名称/合同编号/站点编码/站点名称/车牌号/设备编码" [(ngModel)]="stationName"
+          (input)="handleSortKeyChange()" />
+      </div>
+
+      <div class="searchItem itemSpace">
+        <button nz-button nzType="primary" (click)="search()">查询</button>
+        <button nz-button nzType="default" (click)="add()" *ngIf="userInfo.dataManager || userInfo.manager">新建</button>
+        <button nz-button nzType="primary" (click)="download()"
+          *ngIf="userInfo.dataManager || userInfo.manager">导出</button>
+      </div>
+
+
+    </div>
+    <nz-table class="table_warp" #basicTable [nzData]="tableData" [nzLoading]="loading" [(nzPageIndex)]="q.pageIndex"
+      [(nzTotal)]="q.total" [(nzPageSize)]="q.pageSize" [nzShowSizeChanger]="true" [nzFrontPagination]="false"
+      (nzPageIndexChange)="pageIndexChange($event)" (nzPageSizeChange)="pageSizeChange($event)">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th>序号</th>
+          <th>合同名称</th>
+          <th>合同编号</th>
+          <th>站点数量</th>
+          <th>工程项目经理</th>
+          <th>合同开始时间</th>
+          <th>合同结束时间</th>
+          <th>倒数计时天数</th>
+          <!-- <th>巡检模板</th> -->
+          <th>业主单位</th>
+          <th *ngIf="userInfo.dataManager || userInfo.manager">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;index as i" class="{{'color-'+data.sortNum}}">
+          <td>{{i + 1 + ((q.pageIndex-1) * q.pageSize)}}</td>
+          <td>{{data.name}}</td>
+          <td>{{(data.num)}}</td>
+          <td>{{data.project_manager}}</td>
+          <td>{{data.start_date}}</td>
+          <td>{{data.end_date}}</td>
+          <!-- <td>{{data.name}}</td> -->
+          <td>{{data.company}}</td>
+          <td *ngIf="userInfo.dataManager || userInfo.manager">
+            <a (click)="modify(data.id)">配置</a>
+            <span class="divider"></span>
+            <a (click)="renewal(data.id)">续签</a>
+            <span class="divider"></span>
+            <a (click)="handleFinshContract(data.id)">结束</a>
+            <span class="divider"></span>
+            <a (click)="delete(data.id)">删除</a>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+
+
+
+
+<!-- 配置站点 -->
+<!-- <nz-modal nzMask="false" class="modal_warp" nzWidth="1100px" [(nzVisible)]="showConfigStation" [nzOkText]="null"
+   [nzCancelText]="null" (nzOnCancel)="showConfigStation=false" nzTitle="配置站点">
+   <span>行政规划：</span>
+   <nz-row [nzGutter]="20">
+     <nz-col nzSpan="7">
+       <nz-select style="width: 100%;" [(ngModel)]="province" (ngModelChange)="provinceChange($event)"
+         nzPlaceHolder="请选择">
+         <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+       </nz-select>
+     </nz-col>
+     <nz-col nzSpan="7">
+       <nz-select style="width: 100%;" nzAllowClear="true" [(ngModel)]="city" (ngModelChange)="cityChange($event)"
+         nzPlaceHolder="请选择">
+         <nz-option *ngFor="let item of areaData.city" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+       </nz-select>
+     </nz-col>
+     <nz-col nzSpan="7">
+       <nz-select style="width: 100%;" nzAllowClear="true" [(ngModel)]="area" (ngModelChange)="areaChange($event)"
+         nzPlaceHolder="请选择">
+         <nz-option *ngFor="let item of areaData.area" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+       </nz-select>
+     </nz-col>
+     <nz-col nzSpan="3">
+       <button nz-button nzType="primary">查询</button>
+     </nz-col>
+   </nz-row>
+   <nz-row style="margin-top:20px;" [nzGutter]="20">
+     <nz-col nzSpan="11">
+       <span>站点列表</span>
+       <div class="keyword_search">
+         <input nz-input placeholder="输入站点名称/拼音" [(ngModel)]="noSelectKeyword" />
+       </div>
+       <div class="stations_warp">
+         <nz-table [nzData]="stations" [nzShowPagination]="false">
+           <thead>
+             <tr>
+               <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminate" [(nzChecked)]="isAllChecked"
+                 (nzCheckedChange)="checkAll($event)"></th>
+               <th nzWidth="10%">序号</th>
+               <th nzWidth="50%">站点</th>
+             </tr>
+           </thead>
+           <tbody>
+             <ng-container *ngFor="let data of stations;index as i">
+               <tr *ngIf="data.name.includes(noSelectKeyword) ||
+              data.pinyin.includes(noSelectKeyword.toUpperCase()) ||
+              data.jianpin.includes(noSelectKeyword.toUpperCase())">
+                 <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatus()"></td>
+                 <td>{{ i + 1 }}</td>
+                 <td>{{ data.name }}</td>
+               </tr>
+             </ng-container>
+           </tbody>
+         </nz-table>
+       </div>
+     </nz-col>
+     <nz-col nzSpan="2">
+       <div class="btn_warp">
+         <div>
+           <button nz-button nzType="primary" [disabled]="checkedStation.length === 0" (click)="saveStation($event)">
+             &gt;&gt;
+           </button>
+           <br><br>
+           <button nz-button nzType="primary" [disabled]="checkedStationS.length === 0" (click)="deleteStation($event)">
+             &lt;&lt;
+           </button>
+         </div>
+       </div>
+     </nz-col>
+     <nz-col nzSpan="11">
+       <span>已配站点</span>
+       <div class="keyword_search">
+         <input nz-input placeholder="输入站点名称/拼音" [(ngModel)]="SelectedKeyword" />
+       </div>
+       <div class="stations_warp">
+         <nz-table [nzData]="selectedStations" [nzShowPagination]="false">
+           <thead>
+             <tr>
+               <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminateS" [(nzChecked)]="isAllCheckedS"
+                 (nzCheckedChange)="checkAllS($event)"></th>
+               <th nzWidth="10%">序号</th>
+               <th nzWidth="50%">站点</th>
+             </tr>
+           </thead>
+           <tbody>
+             <ng-container *ngFor="let data of selectedStations;index as i">
+               <tr *ngIf="data.name.includes(SelectedKeyword) ||
+              data.pinyin.includes(SelectedKeyword.toUpperCase()) ||
+              data.jianpin.includes(SelectedKeyword.toUpperCase())">
+                 <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatusS()"></td>
+                 <td>{{ i + 1 }}</td>
+                 <td>{{ data.name }}</td>
+               </tr>
+             </ng-container>
+           </tbody>
+         </nz-table>
+       </div>
+     </nz-col>
+   </nz-row>
+ </nz-modal> -->
+
+<!-- 结束 -->
+<nz-modal [(nzVisible)]="finshContractVis" nzTitle="结束合同" (nzOnCancel)="finshContractVis=false"
+  (nzOnOk)="handleFinshContract()">
+  <p>结束合同后，合同状态变更为已结束。
+    关联站点状态变更为停站，将不再自动派发巡检任务。</p>
+
+  <form *ngIf="finshContractVis" nz-form [formGroup]="finshContractForm" (ngSubmit)="handleFinshContract()" role="form"
+    [nzLayout]="'vertical'">
+    <nz-form-item>
+      <nz-form-label nzRequired>未续签原因</nz-form-label>
+      <nz-form-control>
+        <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+          <textarea rows="4" nz-input formControlName="text" placeholder="请输入未续签原因"></textarea>
+          <!-- <nz-form-explain *ngIf="validateForm('name').dirty && validateForm('name').hasError('required')">请输入项目名称
+              </nz-form-explain> -->
+        </nz-input-group>
+      </nz-form-control>
+    </nz-form-item>
+
+
+
+  </form>
+</nz-modal>
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      合同管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleAdd>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      合同管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      新增
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleModify>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      合同管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      配置
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleRenewal>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      合同管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      续签
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

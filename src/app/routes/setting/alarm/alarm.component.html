@@ -1,0 +1,60 @@
+ <div class="page_warp" >
+   <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+   <nz-card>
+     <div class="query_warp">
+       <span>预警情况：</span>
+       <div>
+          今日即将到期巡检数量：{{opsOverCount}}
+       </div>
+        <div>
+           今日即将到期异常数量：{{taskSoonOverCount}}
+        </div>
+        <div>
+           今日即将到期合同数量：{{contractOverCount}}
+        </div>
+        <div>
+           30日内到期合同数量：{{contractSoonOverCount}}
+        </div>
+         <!-- <span>预警状态：</span>
+         <nz-select style="width: 200px" [(ngModel)]="active" nzAllowClear nzPlaceHolder="请选择">
+           <nz-option [nzValue]="" nzLabel="全部"></nz-option>
+           <nz-option [nzValue]="1" nzLabel="即将到期"></nz-option>
+           <nz-option [nzValue]="2" nzLabel="到期未处理"></nz-option>
+         </nz-select>&nbsp;&nbsp;
+       <button nz-button nzType="primary" (click)="search()">查询</button> -->
+       <!-- <button nz-button nzType="default" (click)="add()">新建</button> -->
+     </div>
+     <nz-row>
+     <nz-col [nzSm]="6">
+       异常任务： 即将到期{{taskSoonOverCount}}条，已超时{{taskOverCount}}条
+     </nz-col>
+     <nz-col [nzSm]="18">
+       <button nz-button nzType="default" (click)="handle(1)" class="query_btn">去处理</button>
+     </nz-col>
+     <nz-col [nzSm]="6">
+       巡检任务：即将到期{{opsSoonOverCount}}条，本月已过期{{opsOverCount}}条
+     </nz-col>
+     <nz-col [nzSm]="18">
+       <button nz-button nzType="default" (click)="handle(2)" class="query_btn">去处理</button>
+     </nz-col>
+     <nz-col [nzSm]="6">
+       合同：即将到期{{contractSoonOverCount}}条，已过期{{contractOverCount}}条
+     </nz-col>
+     <nz-col [nzSm]="18">
+       <button nz-button nzType="default" (click)="handle(3)" class="query_btn">去处理</button>
+     </nz-col>
+      </nz-row>
+   </nz-card>
+ </div>
+
+ <ng-template #nzSubtitle>
+   <nz-breadcrumb nzSeparator=">">
+     <span class="CPosition">当前位置 :</span>
+     <nz-breadcrumb-item>
+       预警管理
+     </nz-breadcrumb-item>
+     <nz-breadcrumb-item>
+       列表查询
+     </nz-breadcrumb-item>
+   </nz-breadcrumb>
+ </ng-template>

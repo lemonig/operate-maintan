@@ -1,0 +1,42 @@
+<div class="page_warp" >
+    <!-- <nz-page-header [nzSubtitle]="车辆里程"> </nz-page-header> -->
+    <nz-card>
+      <div class="query_warp">
+        <div class="searchItem itemSpace">
+          <span>上报时间：</span>
+          <nz-range-picker [(ngModel)]="dateRange"></nz-range-picker>
+          <button nz-button nzType="primary" (click)="search()">查询</button>
+          <button nz-button nzType="default" (click)="download()" >导出</button>
+        </div>
+      </div>
+      <nz-table class="table_warp" #basicTable [nzData]="tableData" [nzLoading]="loading" [(nzPageIndex)]="q.pageIndex"
+        [(nzTotal)]="q.total" [(nzPageSize)]="q.pageSize" [nzShowSizeChanger]="true" [nzFrontPagination]="false"
+        (nzPageIndexChange)="pageIndexChange($event)" (nzPageSizeChange)="pageSizeChange($event)">
+        <thead>
+          <tr style="position: relative;" appTableScroll>
+            <th>序号</th>
+            <th>车牌</th>
+            <th>使用人</th>
+            <th>里程表读数</th>
+            <th>项目号</th>
+            <th>所属阶段</th>
+            <th>备注</th>
+            <th>上报时间</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of basicTable.data;index as i">
+            <td>{{i + 1 + ((q.pageIndex-1) * q.pageSize)}}</td>
+            <td>{{data.car_num}}</td>
+            <td>{{data.user?.nickname}}</td>
+            <td>{{data.mileage}}</td>
+            <td>{{data.contract_num}}</td>
+            <td>{{data.stage_str}}</td>
+            <td>{{data.description}}</td>
+            <td>{{data.gmt_create | date:'yyyy-MM-dd HH:mm'}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </nz-card>
+  </div>
+  

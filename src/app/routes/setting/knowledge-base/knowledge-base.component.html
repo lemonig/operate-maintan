@@ -1,0 +1,109 @@
+<div class="page_warp">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="user_btns">
+      <span>文档类型：</span>
+      <nz-select class="itemSpace" style="width:150px;" [(ngModel)]="selectDocumentType" nzAllowClear
+        nzPlaceHolder="请选择文档类型">
+        <nz-option *ngFor="let item of metaData" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+      </nz-select>
+      <button nz-button nzType="primary" (click)="search()">查询</button>
+      <button nz-button nzType="default" (click)="upload()">上传</button>
+    </div>
+    <nz-table class="table_warp" #basicTable [nzPageSize]="20" [nzData]="tableData" [nzLoading]="loading">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th nzWidth="20%">文档名称</th>
+          <!-- <th nzWidth="20%">上传人</th> -->
+          <th nzWidth="20%">上传时间</th>
+          <th nzWidth="20%">文档类型</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;">
+          <td>{{data.name}}</td>
+          <!-- <td>{{data.owner?.nickname}}</td> -->
+          <td>{{data.gmt_create | date: 'yyyy/MM/dd'}}</td>
+          <td>{{data.categoryString}}</td>
+          <td>
+            <a download [href]="data.downloadUrl">下载</a>
+            <span class="divider"></span>
+            <a (click)="modifyData(data)">修改</a>
+            <span class="divider"></span>
+            <a (click)="delete(data.id)">删除</a>
+            <span class="divider"></span>
+            <a target="_blank" [href]="data.previewUrl">预览</a>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+<!-- 新增 -->
+<nz-modal nzMask="false" nzWidth="650px" [(nzVisible)]="newDataModal" nzTitle="上传" [nzOkLoading]="isOkLoading"
+  (nzOnCancel)="newDataModal=false;isOkLoading=false;" (nzOnOk)="handleData(1)">
+  <form *ngIf="newDataModal" nz-form [formGroup]="addDataForm" (ngSubmit)="handleData(1)" role="form">
+    <nz-row>
+      <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="6">文档类型</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-select nzSize="large" formControlName="category" nzAllowClear nzPlaceHolder="请选择文档类型">
+              <nz-option *ngFor="let item of metaData" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+            </nz-select>
+            <nz-form-explain *ngIf="validateForm('category').dirty && validateForm('category').hasError('required')">
+              请选择文档类型</nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+    </nz-row>
+  </form>
+  <nz-row>
+    <nz-col [nzSm]="24">
+      <nz-form-item>
+        <nz-form-label [nzSm]="6">选择文件</nz-form-label>
+        <nz-form-control [nzSm]="18">
+          <nz-upload [nzCustomRequest]="fileUpload" [(nzFileList)]="fileList">
+            <button nzSize="large" nz-button>
+              <i nz-icon nzSize="large" type="upload"></i><span>选择文件</span>
+            </button>
+          </nz-upload>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+  </nz-row>
+</nz-modal>
+<!-- 修改 -->
+<nz-modal nzMask="false" nzWidth="650px" [(nzVisible)]="modifyDataModal" nzTitle="修改" [nzOkLoading]="isOkLoading"
+  (nzOnCancel)="modifyDataModal=false;isOkLoading=false;" (nzOnOk)="handleData(2)">
+  <form *ngIf="modifyDataModal" nz-form [formGroup]="modifyDataForm" (ngSubmit)="handleData(2)" role="form">
+    <nz-row>
+      <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="6">文档类型</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-select nzSize="large" formControlName="category" nzAllowClear nzPlaceHolder="请选择文档类型">
+              <nz-option *ngFor="let item of metaData" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+            </nz-select>
+            <nz-form-explain *ngIf="validateForm1('category').dirty && validateForm1('category').hasError('required')">
+              请选择文档类型</nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+    </nz-row>
+  </form>
+</nz-modal>
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      知识库
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      知识库
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

@@ -1,0 +1,619 @@
+<!-- 配置 -->
+<div class="page_warp">
+  <nz-page-header (nzBack)="goBack()" nzBackIcon [nzSubtitle]="nzSubtitleModify"> </nz-page-header>
+  <nz-card>
+
+    <nz-tabset>
+      <nz-tab nzTitle="基本信息">
+        <form nz-form [formGroup]="modifyDataForm" role="form" *ngIf="modifyDataForm">
+          <nz-card nzTitle="合同信息">
+            <nz-row>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzSpan="6">合同名称</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzSpan="6">合同编号</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <input style="width:200px;" nz-input placeholder="请输入" formControlName="num" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzSpan="6">工程项目经理</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <input style="width:200px;" nz-input placeholder="请输入" formControlName="project_manager" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzSpan="6">合同开始时间</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <nz-date-picker style="width:200px;" formControlName="start_date"></nz-date-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzSpan="6">合同结束时间</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <nz-date-picker style="width:200px;" formControlName="end_date"></nz-date-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzSpan="6">监测频次</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <input style="width:200px;" nz-input placeholder="请输入" formControlName="daily_count" /> 小时/次
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzSpan="6">省份</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                    <nz-select style="width: 200px" formControlName="region_key" nzPlaceHolder="请选择">
+                      <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title">
+                      </nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">合同金额</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <input style="width:200px;" nz-input placeholder="请输入" formControlName="total" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">运维费用</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <input style="width:200px;" nz-input placeholder="请输入" formControlName="ops_money" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzSpan="6">合同状态</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                    <nz-select style="width: 200px" formControlName="state" nzPlaceHolder="请选择">
+                      <nz-option *ngFor="let item of contractStateList" [nzValue]="item.value" [nzLabel]="item.label">
+                      </nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">运维开始时间</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <nz-date-picker style="width:200px;" formControlName="ops_start_date"></nz-date-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">运维结束时间</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <nz-date-picker style="width:200px;" formControlName="ops_end_date"></nz-date-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">校验时间</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                    <nz-date-picker style="width:200px;" formControlName="check_date"></nz-date-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="2" style="color: rgba(0, 0, 0, 0.85);text-align: right;padding-right: 5px;">
+                <div>站点数量:</div>
+              </nz-col>
+              <nz-col nzSpan="6" style="color: rgba(0, 0, 0, 0.85);padding-left: 5px;">
+                <div>{{stationCount}}</div>
+              </nz-col>
+            </nz-row>
+          </nz-card>
+          <nz-row>
+            <nz-card nzTitle="业主信息">
+              <nz-row>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">业主单位</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <input style="width:200px;" nz-input placeholder="请输入" formControlName="company" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">单位联系人</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <input style="width:200px;" nz-input placeholder="请输入" formControlName="contacter" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">联系方式</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-input-number style="width:200px;" formControlName="phone" nzPlaceHolder="请输入">
+                      </nz-input-number>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+              </nz-row>
+            </nz-card>
+
+            <nz-card nzTitle="续签情况">
+              <nz-row>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">业主单位</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <input style="width:200px;" nz-input placeholder="请输入" formControlName="company" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">单位联系人</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <input style="width:200px;" nz-input placeholder="请输入" formControlName="contacter" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+                <nz-col nzSpan="8">
+                  <nz-form-item>
+                    <nz-form-label nzRequired nzSpan="6">联系方式</nz-form-label>
+                    <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                      <nz-input-number style="width:200px;" formControlName="phone" nzPlaceHolder="请输入">
+                      </nz-input-number>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+              </nz-row>
+            </nz-card>
+
+            <!-- <nz-card nzTitle="运维考核要求">
+               <nz-row>
+                 <nz-col nzSpan="24">
+                   <nz-form-item>
+                     <nz-form-control nzSpan="24" nzErrorTip="请输入">
+                       <textarea style="width: 400px" nz-input placeholder="请输入" formControlName="name"></textarea>
+                     </nz-form-control>
+                   </nz-form-item>
+                 </nz-col>
+                 <nz-col nzSpan="24">
+                   <nz-form-item>
+                     <nz-form-control nzSpan="24">
+                       <nz-upload [nzCustomRequest]="fileUpload" [(nzFileList)]="fileList">
+                         <button nz-button><i nz-icon nzType="upload"></i><span>上传文件</span></button>
+                       </nz-upload>
+                       <div>支持扩展名：.rar .zip .doc .docx .pdf .jpg...</div>
+                     </nz-form-control>
+                   </nz-form-item>
+                 </nz-col>
+               </nz-row>
+             </nz-card> -->
+
+
+            <nz-card nzTitle="备注">
+              <nz-row>
+                <nz-col nzSpan="24">
+                  <nz-form-item>
+                    <nz-form-control nzSpan="24" nzErrorTip="请输入">
+                      <textarea style="width: 400px" nz-input placeholder="请输入"
+                        formControlName="description"></textarea>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col>
+              </nz-row>
+            </nz-card>
+          </nz-row>
+        </form>
+        <div>
+          <nz-row>
+            <nz-col nzSpan="2">
+            </nz-col>
+            <nz-col nzSpan="22">
+              <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="saveModifyData()">保存</button>
+            </nz-col>
+          </nz-row>
+        </div>
+      </nz-tab>
+
+      <nz-tab nzTitle="配置站点">
+        <!-- 配置站点 -->
+
+        <span>行政规划：</span>
+        <nz-row [nzGutter]=20>
+          <nz-col nzSpan="8">
+            <nz-select style="width: 100%;" [(ngModel)]="province" (ngModelChange)="provinceChange($event)"
+              nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+            </nz-select>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-select style="width: 100%;" nzAllowClear="true" [(ngModel)]="city" (ngModelChange)="cityChange($event)"
+              nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of areaData.city" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+            </nz-select>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-select style="width: 100%;" nzAllowClear="true" [(ngModel)]="area" (ngModelChange)="areaChange($event)"
+              nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of areaData.area" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+            </nz-select>
+          </nz-col>
+        </nz-row>
+        <nz-row style="margin-top:20px;" [nzGutter]=20>
+          <nz-col nzSpan="11">
+            <span>站点列表</span>
+            <div class="keyword_search">
+              <input nz-input placeholder="输入站点名称/拼音" [(ngModel)]="noSelectKeyword" />
+            </div>
+            <div class="stations_warp">
+              <nz-table class="table_warp" [nzData]="stations" [nzShowPagination]="false">
+                <thead>
+                  <tr>
+                    <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminate" [(nzChecked)]="isAllChecked"
+                      (nzCheckedChange)="checkAll($event)"></th>
+                    <th nzWidth="10%">序号</th>
+                    <th nzWidth="50%">站点</th>
+                    <!-- <th nzWidth="5%">省份</th>
+                    <th nzWidth="5%">城市</th>
+                    <th nzWidth="5%">区县</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let data of stations;index as i">
+                    <tr *ngIf="data.name.includes(noSelectKeyword) ||
+                    data.pinyin.includes(noSelectKeyword.toUpperCase()) ||
+                    data.jianpin.includes(noSelectKeyword.toUpperCase())">
+                      <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatus()"></td>
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ data.name }}</td>
+                      <!-- <td></td>
+                          <td></td>
+                          <td></td> -->
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </nz-table>
+            </div>
+          </nz-col>
+          <nz-col nzSpan="2">
+            <div class="btn_warp">
+              <div>
+                <button nz-button nzType="primary" [disabled]="checkedStation.length === 0"
+                  (click)="saveStation($event)">
+                  &gt;&gt;
+                </button>
+                <br><br>
+                <button nz-button nzType="primary" [disabled]="checkedStationS.length === 0"
+                  (click)="deleteStation($event)">
+                  &lt;&lt;
+                </button>
+              </div>
+            </div>
+          </nz-col>
+          <nz-col nzSpan="11">
+            <span>已配站点</span>
+            <div class="keyword_search">
+              <input nz-input placeholder="输入站点名称/拼音" [(ngModel)]="SelectedKeyword" />
+            </div>
+            <div class="stations_warp">
+              <nz-table class="table_warp" [nzData]="selectedStations" [nzShowPagination]="false">
+                <thead>
+                  <tr>
+                    <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminateS" [(nzChecked)]="isAllCheckedS"
+                      (nzCheckedChange)="checkAllS($event)"></th>
+                    <th nzWidth="10%">序号</th>
+                    <th nzWidth="50%">站点</th>
+                    <!-- <th nzWidth="5%">省份</th>
+                    <th nzWidth="5%">城市</th>
+                    <th nzWidth="5%">区县</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let data of selectedStations;index as i">
+                    <tr *ngIf="data.name.includes(SelectedKeyword) ||
+                    data.pinyin.includes(SelectedKeyword.toUpperCase()) ||
+                    data.jianpin.includes(SelectedKeyword.toUpperCase())">
+                      <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatusS()"></td>
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ data.name }}</td>
+                      <!-- <td></td>
+                          <td></td>
+                          <td></td> -->
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </nz-table>
+            </div>
+          </nz-col>
+        </nz-row>
+
+      </nz-tab>
+
+      <nz-tab nzTitle="配置车辆" (nzClick)="getCarInfo()">
+        <!-- 配置站点 -->
+
+        <!-- <span>行政规划：</span>
+        <nz-row [nzGutter]=20>
+          <nz-col nzSpan="8">
+            <nz-select style="width: 100%;" [(ngModel)]="province" (ngModelChange)="provinceChange($event)"
+              nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+            </nz-select>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-select style="width: 100%;" nzAllowClear="true" [(ngModel)]="city" (ngModelChange)="cityChange($event)"
+              nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of areaData.city" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+            </nz-select>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-select style="width: 100%;" nzAllowClear="true" [(ngModel)]="area" (ngModelChange)="areaChange($event)"
+              nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of areaData.area" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+            </nz-select>
+          </nz-col>
+        </nz-row> -->
+        <nz-row style="margin-top:20px;" [nzGutter]=20>
+          <nz-col nzSpan="11">
+            <span>车辆列表</span>
+            <div class="keyword_search">
+              <input nz-input placeholder="输入车牌号" [(ngModel)]="noSelectKeywordC" />
+            </div>
+            <div class="stations_warp">
+              <nz-table class="table_warp" [nzData]="cars" [nzShowPagination]="false">
+                <thead>
+                  <tr>
+                    <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminateC" [(nzChecked)]="isAllCheckedC"
+                      (nzCheckedChange)="checkAllC($event)"></th>
+                    <th nzWidth="10%">序号</th>
+                    <th nzWidth="50%">车牌</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let data of cars;index as i">
+                    <tr *ngIf="data.car_num.includes(noSelectKeywordC)">
+                      <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatusC()"></td>
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ data.car_num }}</td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </nz-table>
+            </div>
+          </nz-col>
+          <nz-col nzSpan="2">
+            <div class="btn_warp">
+              <div>
+                <button nz-button nzType="primary" [disabled]="checkedCar.length === 0" (click)="saveCar($event)">
+                  &gt;&gt;
+                </button>
+                <br><br>
+                <button nz-button nzType="primary" [disabled]="checkedCarS.length === 0" (click)="deleteCar($event)">
+                  &lt;&lt;
+                </button>
+              </div>
+            </div>
+          </nz-col>
+          <nz-col nzSpan="11">
+            <span>已配车辆</span>
+            <div class="keyword_search">
+              <input nz-input placeholder="输入车牌号" [(ngModel)]="SelectedKeyword" />
+            </div>
+            <div class="stations_warp">
+              <nz-table class="table_warp" [nzData]="selectedCars" [nzShowPagination]="false">
+                <thead>
+                  <tr>
+                    <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminateCS" [(nzChecked)]="isAllCheckedCS"
+                      (nzCheckedChange)="checkAllCS($event)"></th>
+                    <th nzWidth="10%">序号</th>
+                    <th nzWidth="50%">车牌</th>
+                    <!-- <th nzWidth="5%">省份</th>
+                    <th nzWidth="5%">城市</th>
+                    <th nzWidth="5%">区县</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let data of selectedCars;index as i">
+                    <tr *ngIf="data.car_num.includes(SelectedKeywordC)">
+                      <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatusCS()"></td>
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ data.car_num }}</td>
+                      <!-- <td></td>
+                          <td></td>
+                          <td></td> -->
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </nz-table>
+            </div>
+          </nz-col>
+        </nz-row>
+
+      </nz-tab>
+      <nz-tab nzTitle="配置固定资产" (nzClick)="getToolInfo()">
+        <!-- 配置站点 -->
+
+        <!-- <span>行政规划：</span>
+        <nz-row [nzGutter]=20>
+          <nz-col nzSpan="8">
+            <nz-select style="width: 100%;" [(ngModel)]="province" (ngModelChange)="provinceChange($event)"
+              nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+            </nz-select>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-select style="width: 100%;" nzAllowClear="true" [(ngModel)]="city" (ngModelChange)="cityChange($event)"
+              nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of areaData.city" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+            </nz-select>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-select style="width: 100%;" nzAllowClear="true" [(ngModel)]="area" (ngModelChange)="areaChange($event)"
+              nzPlaceHolder="请选择">
+              <nz-option *ngFor="let item of areaData.area" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+            </nz-select>
+          </nz-col>
+        </nz-row> -->
+        <nz-row style="margin-top:20px;" [nzGutter]=20>
+          <nz-col nzSpan="11">
+            <span>固定资产列表</span>
+            <div class="keyword_search">
+              <input nz-input placeholder="输入固定资产名称" [(ngModel)]="noSelectKeywordT" />
+            </div>
+            <div class="stations_warp">
+              <nz-table class="table_warp" [nzData]="tools" [nzShowPagination]="false">
+                <thead>
+                  <tr>
+                    <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminateT" [(nzChecked)]="isAllCheckedT"
+                      (nzCheckedChange)="checkAllT($event)"></th>
+                    <th nzWidth="10%">序号</th>
+                    <th nzWidth="30%">固定资产名称</th>
+                    <th nzWidth="20%">物料编号</th>
+                    <th nzWidth="20%">资产编号</th>
+                    <th nzWidth="15%">型号</th>
+
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let data of tools;index as i">
+                    <tr *ngIf="data.name.includes(noSelectKeywordT)">
+                      <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatusT()"></td>
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ data.name }}</td>
+                      <td>{{ data.material_code }}</td>
+                      <td>{{ data.asset_code }}</td>
+                      <td>{{ data.version }}</td>
+
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </nz-table>
+            </div>
+          </nz-col>
+          <nz-col nzSpan="2">
+            <div class="btn_warp">
+              <div>
+                <button nz-button nzType="primary" [disabled]="checkedTool.length === 0" (click)="saveTool($event)">
+                  &gt;&gt;
+                </button>
+                <br><br>
+                <button nz-button nzType="primary" [disabled]="checkedToolS.length === 0" (click)="deleteTool($event)">
+                  &lt;&lt;
+                </button>
+              </div>
+            </div>
+          </nz-col>
+          <nz-col nzSpan="11">
+            <span>已配固定资产</span>
+            <div class="keyword_search">
+              <input nz-input placeholder="输入固定资产名称" [(ngModel)]="SelectedKeyword" />
+            </div>
+            <div class="stations_warp">
+              <nz-table class="table_warp" [nzData]="selectedTools" [nzShowPagination]="false">
+                <thead>
+                  <tr>
+                    <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminateTS" [(nzChecked)]="isAllCheckedTS"
+                      (nzCheckedChange)="checkAllTS($event)"></th>
+                    <th nzWidth="10%">序号</th>
+                    <th nzWidth="30%">固定资产名称</th>
+                    <th nzWidth="20%">物料编号</th>
+                    <th nzWidth="20%">资产编号</th>
+                    <th nzWidth="15%">型号</th>
+                    <!-- <th nzWidth="5%">省份</th>
+                    <th nzWidth="5%">城市</th>
+                    <th nzWidth="5%">区县</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let data of selectedTools;index as i">
+                    <tr *ngIf="data.name.includes(SelectedKeywordT)">
+                      <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatusTS()"></td>
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ data.name }}</td>
+                      <td>{{ data.material_code }}</td>
+                      <td>{{ data.asset_code }}</td>
+                      <td>{{ data.version }}</td>
+                      <!-- <td></td>
+                          <td></td>
+                          <td></td> -->
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </nz-table>
+            </div>
+          </nz-col>
+        </nz-row>
+
+      </nz-tab>
+      <nz-tab nzTitle="合同服务目录">
+        <nz-table class="table_warp" #basicTable [nzData]="serveTableData" [nzLoading]="loading"
+          [(nzPageIndex)]="qs.pageIndex" [(nzTotal)]="qs.total" [(nzPageSize)]="qs.pageSize" [nzShowSizeChanger]="true"
+          [nzFrontPagination]="false" (nzPageIndexChange)="pageIndexChangeServe($event)"
+          (nzPageSizeChange)="pageSizeChangeServe($event)">
+          <thead>
+            <tr style="position: relative;" appTableScroll>
+              <th>序号</th>
+              <th>所属单元</th>
+              <th>巡检项目</th>
+              <th>频率</th>
+              <th>备注</th>
+              <th *ngIf="userInfo.dataManager || userInfo.manager">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of basicTable.data;index as i" class="{{'color-'+data.sortNum}}">
+              <td>{{i + 1 + ((qs.pageIndex-1) * qs.pageSize)}}</td>
+              <td>{{data.name}}</td>
+              <td>{{(data.num)}}</td>
+              <td>{{data.project_manager}}</td>
+              <td>{{data.start_date}}</td>
+              <td>{{data.end_date}}</td>
+              <!-- <td>{{data.name}}</td> -->
+              <td>{{data.company}}</td>
+              <td *ngIf="userInfo.dataManager || userInfo.manager">
+                <a (click)="serveEdit(data.id)">编辑</a>
+                <span class="divider"></span>
+                <a (click)="serveDele(data.id)">删除</a>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-tab>
+    </nz-tabset>
+  </nz-card>
+</div>
+
+<ng-template #nzSubtitleModify>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      合同管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      配置
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

@@ -1,0 +1,181 @@
+<div class="page_warp">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="user_btns">
+      <span>用户名称：</span>
+      <input class="itemSpace" nz-input style="width:180px;" placeholder="请输入用户名称" [(ngModel)]="searchQuery.keyword" />
+      <button nz-button nzType="primary" (click)="refresh()">查询</button>
+    </div>
+    <nz-table class="table_warp" #basicTable [(nzPageSize)]="PageSize" [nzData]="tableData" [nzLoading]="loading"
+      [(nzPageIndex)]="pageIndex" [nzShowSizeChanger]="true">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th nzWidth="10%">序号</th>
+          <th style="text-align: left;" nzWidth="20%">用户</th>
+          <th *ngIf="userInfo.dataManager || userInfo.manager">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;index as i">
+          <td>{{i + 1 + ((pageIndex-1) * PageSize)}}</td>
+          <td>{{data.nickname}}</td>
+          <td *ngIf="userInfo.dataManager || userInfo.manager">
+            <ng-container *ngIf="data.ops">
+              <a (click)="configStation(data.id, 1)">配置运维站点</a>
+              <span class="divider"></span>
+            </ng-container>
+            <ng-container *ngIf="data.opsCityManager">
+              <a (click)="configStation(data.id, 2)">配置地级负责人站点</a>
+              <span class="divider"></span>
+            </ng-container>
+            <ng-container *ngIf="data.opsRegionManager">
+              <a (click)="configStation(data.id, 3)">配置省级负责人站点</a>
+              <span class="divider"></span>
+            </ng-container>
+            <ng-container *ngIf="data.dataManager">
+              <a (click)="configStation(data.id, 4)">配置数据管理员站点</a>
+              <span class="divider"></span>
+            </ng-container>
+            <ng-container *ngIf="data.assistant">
+              <a (click)="configStation(data.id, 5)">配置运维助理站点</a>
+              <span class="divider"></span>
+            </ng-container>
+            <ng-container *ngIf="data.opsAreaManager">
+              <a (click)="configStation(data.id, 6)">配置地区负责人站点</a>
+              <span class="divider"></span>
+            </ng-container>
+            <ng-container *ngIf="data.projectManager">
+              <a (click)="configStation(data.id, 7)">配置项目负责人站点</a>
+              <span class="divider"></span>
+            </ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+<!-- 配置站点 -->
+<nz-modal nzMask="false" class="modal_warp" nzWidth="1100px" [(nzVisible)]="showconfigStation" [nzOkText]="null"
+  [nzCancelText]="null" (nzOnCancel)="showconfigStation=false" nzTitle="配置站点">
+  <span>行政规划：</span>
+  <nz-row [nzGutter]=20>
+    <nz-col nzSpan="8">
+      <nz-select style="width: 100%;" [(ngModel)]="province" (ngModelChange)="provinceChange($event)"
+        nzPlaceHolder="请选择">
+        <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+      </nz-select>
+    </nz-col>
+    <nz-col nzSpan="8">
+      <nz-select style="width: 100%;" nzAllowClear="true" [(ngModel)]="city" (ngModelChange)="cityChange($event)"
+        nzPlaceHolder="请选择">
+        <nz-option *ngFor="let item of areaData.city" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+      </nz-select>
+    </nz-col>
+    <nz-col nzSpan="8">
+      <nz-select style="width: 100%;" nzAllowClear="true" [(ngModel)]="area" (ngModelChange)="areaChange($event)"
+        nzPlaceHolder="请选择">
+        <nz-option *ngFor="let item of areaData.area" [nzValue]="item.key" [nzLabel]="item.title"></nz-option>
+      </nz-select>
+    </nz-col>
+  </nz-row>
+  <nz-row style="margin-top:20px;" [nzGutter]=20>
+    <nz-col nzSpan="11">
+      <span>站点列表</span>
+      <div class="keyword_search">
+        <input nz-input placeholder="输入站点名称/拼音" [(ngModel)]="noSelectKeyword" />
+      </div>
+      <div class="stations_warp">
+        <nz-table class="table_warp" [nzData]="stations" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminate" [(nzChecked)]="isAllChecked"
+                (nzCheckedChange)="checkAll($event)"></th>
+              <th nzWidth="10%">序号</th>
+              <th nzWidth="50%">站点</th>
+              <!-- <th nzWidth="5%">省份</th>
+              <th nzWidth="5%">城市</th>
+              <th nzWidth="5%">区县</th> -->
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let data of stations;index as i">
+              <tr *ngIf="data.name.includes(noSelectKeyword) ||
+              data.pinyin.includes(noSelectKeyword.toUpperCase()) ||
+              data.jianpin.includes(noSelectKeyword.toUpperCase())">
+                <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatus()"></td>
+                <td>{{ i + 1 }}</td>
+                <td>{{ data.name }}</td>
+                <!-- <td></td>
+                    <td></td>
+                    <td></td> -->
+              </tr>
+            </ng-container>
+          </tbody>
+        </nz-table>
+      </div>
+    </nz-col>
+    <nz-col nzSpan="2">
+      <div class="btn_warp">
+        <div>
+          <button nz-button nzType="primary" [disabled]="checkedStation.length === 0" (click)="saveStation($event)">
+            &gt;&gt;
+          </button>
+          <br><br>
+          <button nz-button nzType="primary" [disabled]="checkedStationS.length === 0" (click)="deleteStation($event)">
+            &lt;&lt;
+          </button>
+        </div>
+      </div>
+    </nz-col>
+    <nz-col nzSpan="11">
+      <span>已配站点</span>
+      <div class="keyword_search">
+        <input nz-input placeholder="输入站点名称/拼音" [(ngModel)]="SelectedKeyword" />
+      </div>
+      <div class="stations_warp">
+        <nz-table class="table_warp" [nzData]="selectedStations" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminateS" [(nzChecked)]="isAllCheckedS"
+                (nzCheckedChange)="checkAllS($event)"></th>
+              <th nzWidth="10%">序号</th>
+              <th nzWidth="50%">站点</th>
+              <!-- <th nzWidth="5%">省份</th>
+              <th nzWidth="5%">城市</th>
+              <th nzWidth="5%">区县</th> -->
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let data of selectedStations;index as i">
+              <tr *ngIf="data.name.includes(SelectedKeyword) ||
+              data.pinyin.includes(SelectedKeyword.toUpperCase()) ||
+              data.jianpin.includes(SelectedKeyword.toUpperCase())">
+                <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatusS()"></td>
+                <td>{{ i + 1 }}</td>
+                <td>{{ data.name }}</td>
+                <!-- <td></td>
+                    <td></td>
+                    <td></td> -->
+              </tr>
+            </ng-container>
+          </tbody>
+        </nz-table>
+      </div>
+    </nz-col>
+  </nz-row>
+</nz-modal>
+
+
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      用户管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      站点权限
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

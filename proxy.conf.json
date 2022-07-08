@@ -1,0 +1,10 @@
+{
+  "/api/*": {
+    "target": "http://frpc-1.01oak.com/",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": "/api"
+    }
+  }
+}

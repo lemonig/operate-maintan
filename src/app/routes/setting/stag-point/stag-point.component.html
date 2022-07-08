@@ -1,0 +1,647 @@
+<div class="page_warp" *ngIf="!showAddPage && !showModifyPage">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="query_warp">
+      <!-- <span>办事处名称：</span>
+      <input style="width: 200px" nz-input placeholder="办事处名称或拼音" [(ngModel)]="keyword" />&nbsp;&nbsp; -->
+      <button nz-button nzType="primary" (click)="search()">查询</button>
+      <button nz-button nzType="default" (click)="add()" *ngIf="userInfo.dataManager || userInfo.manager">新建</button>
+      <button nz-button nzType="primary" (click)="download()" *ngIf="userInfo.dataManager || userInfo.manager">导出</button>
+    </div>
+    <nz-table class="table_warp" #basicTable [nzData]="tableData" [nzLoading]="loading" [(nzPageIndex)]="q.pageIndex"
+      [(nzTotal)]="q.total" [(nzPageSize)]="q.pageSize" [nzShowSizeChanger]="true" [nzFrontPagination]="false"
+      (nzPageIndexChange)="pageIndexChange($event)" (nzPageSizeChange)="pageSizeChange($event)">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th>序号</th>
+          <th>办事处名称</th>
+          <th>行政区划</th>
+          <th>房间数</th>
+          <th>使用房间数</th>
+          <th>合同期限</th>
+          <th>联系人</th>
+          <th *ngIf="userInfo.dataManager || userInfo.manager">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;index as i">
+          <td>{{i + 1 + ((q.pageIndex-1) * q.pageSize)}}</td>
+          <td>{{data.name}}</td>
+          <td>{{(data.area)}}</td>
+          <td>{{data.count_room}}</td>
+          <td>{{data.count_room_used}}</td>
+          <td>
+            {{(data.start_date ? data.start_date : '') + '~' + (data.end_date ? data.end_date : '')}}
+          </td>
+          <td>{{data.contacter}}</td>
+          <td *ngIf="userInfo.dataManager || userInfo.manager">
+            <a (click)="modify(data.id)">编辑</a>
+            <span class="divider"></span>
+            <a (click)="delete(data.id)">删除</a>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+<!-- 新增 -->
+<div class="page_warp" *ngIf="showAddPage">
+  <nz-page-header (nzBack)="showAddPage=false" nzBackIcon [nzSubtitle]="nzSubtitleAdd"> </nz-page-header>
+  <nz-card>
+    <form nz-form [formGroup]="addDataForm" role="form">
+      <nz-card nzTitle="基本信息">
+        <nz-row>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">办事处名称</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <!-- <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">区域</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col> -->
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">房东</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="landlord" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">房东电话</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-input-number style="width:200px;" formControlName="landlord_phone" nzPlaceHolder="请输入">
+                </nz-input-number>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">中介</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="agent" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">中介电话</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-input-number style="width:200px;" formControlName="agent_phone" nzPlaceHolder="请输入">
+                </nz-input-number>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">房间数</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-input-number style="width:200px;" formControlName="count_room" nzPlaceHolder="请输入">
+                </nz-input-number>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">实际使用房间数</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-input-number style="width:200px;" formControlName="count_room_used" nzPlaceHolder="请输入">
+                </nz-input-number>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">合同开始日期</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-date-picker style="width:200px;" formControlName="start_date"></nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">合同结束日期</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-date-picker style="width:200px;" formControlName="end_date"></nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">租金金额 (年)</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-input-number style="width:186px;" formControlName="rent_of_year" nzPlaceHolder="请输入">
+                </nz-input-number> 元
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">物业费 (年)</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-input-number style="width:186px;" formControlName="fee_of_year" nzPlaceHolder="请输入">
+                </nz-input-number> 元
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">缴费方式</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-select style="width: 200px" formControlName="pay_method" nzAllowClear nzPlaceHolder="请选择">
+                  <nz-option *ngFor="let item of allOriginData.payMethod" [nzValue]="item.value" [nzLabel]="item.label">
+                  </nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">是否有押金</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-select style="width: 200px" formControlName="has_returnable_deposit" nzAllowClear
+                  nzPlaceHolder="请选择">
+                  <nz-option [nzValue]="true" nzLabel="是"></nz-option>
+                  <nz-option [nzValue]="false" nzLabel="否"></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+        </nz-row>
+      </nz-card>
+      <nz-row>
+        <nz-card nzTitle="位置">
+          <nz-row>
+            <nz-col [nzSm]="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">省份</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                  <nz-select style="width: 200px" (ngModelChange)="provinceChange($event)" formControlName="region_key"
+                    nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">城市</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                  <nz-select style="width: 200px" formControlName="city_key" (ngModelChange)="cityChange($event)"
+                    nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of areaData.city" [nzValue]="item.key" [nzLabel]="item.title">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">区域</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                  <nz-select style="width: 200px" formControlName="district_key" nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of areaData.area" [nzValue]="item.key" [nzLabel]="item.title">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">经度</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-input-number style="width:200px;" formControlName="coordinate1" nzPlaceHolder="请输入">
+                  </nz-input-number>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">纬度</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-input-number style="width:200px;" formControlName="coordinate2" nzPlaceHolder="请输入">
+                  </nz-input-number>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">驻点地址</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="address" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+        <nz-card nzTitle="管理员">
+          <nz-row>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">联系人</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="contacter" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">联系电话</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-input-number style="width:200px;" formControlName="contacter_phone" nzPlaceHolder="请输入">
+                  </nz-input-number>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">其他驻点人员</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="roommates" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+        <nz-card nzTitle="其他">
+          <nz-row>
+            <nz-col nzSpan="24">
+              <nz-form-item>
+                <nz-form-label nzSpan="2">工具</nz-form-label>
+                <nz-form-control nzSpan="22" nzErrorTip="请输入">
+                  <textarea style="width: 400px" nz-input placeholder="请输入" formControlName="tools"></textarea>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="24">
+              <nz-form-item>
+                <nz-form-label nzSpan="2">备机</nz-form-label>
+                <nz-form-control nzSpan="22" nzErrorTip="请输入">
+                  <textarea style="width: 400px" nz-input placeholder="请输入" formControlName="instruments"></textarea>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="24">
+              <nz-form-item>
+                <nz-form-label nzSpan="2"></nz-form-label>
+                <nz-form-control nzSpan="22" nzErrorTip="请输入">
+                  <label nz-checkbox formControlName="reagent_store">是否临时存放试剂</label>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <!-- <nz-col nzSpan="24">
+              <nz-form-item>
+                <nz-form-label nzSpan="2">固定资产</nz-form-label>
+                <nz-form-control nzSpan="22" nzErrorTip="请输入">
+                  <textarea style="width: 400px" nz-input placeholder="请输入" formControlName="name"></textarea>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col> -->
+          </nz-row>
+        </nz-card>
+      </nz-row>
+    </form>
+    <div>
+      <nz-row>
+        <nz-col nzSpan="2">
+        </nz-col>
+        <nz-col nzSpan="22">
+          <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="saveNewData()">保存</button>
+        </nz-col>
+      </nz-row>
+    </div>
+  </nz-card>
+</div>
+<!-- 修改 -->
+<div class="page_warp" *ngIf="showModifyPage">
+  <nz-page-header (nzBack)="showModifyPage=false" nzBackIcon [nzSubtitle]="nzSubtitleModify"> </nz-page-header>
+  <nz-card>
+    <form nz-form [formGroup]="modifyDataForm" role="form">
+      <nz-card nzTitle="基本信息">
+        <nz-row>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">办事处名称</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <!-- <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzSpan="6">区域</nz-form-label>
+                  <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                    <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col> -->
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">房东</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="landlord" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">房东电话</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-input-number style="width:200px;" formControlName="landlord_phone" nzPlaceHolder="请输入">
+                </nz-input-number>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">中介</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="agent" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">中介电话</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-input-number style="width:200px;" formControlName="agent_phone" nzPlaceHolder="请输入">
+                </nz-input-number>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">房间数</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-input-number style="width:200px;" formControlName="count_room" nzPlaceHolder="请输入">
+                </nz-input-number>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">实际使用房间数</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-input-number style="width:200px;" formControlName="count_room_used" nzPlaceHolder="请输入">
+                </nz-input-number>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">合同开始日期</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-date-picker style="width:200px;" formControlName="start_date"></nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">合同结束日期</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="end_date" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">租金金额 (年)</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-input-number style="width:186px;" formControlName="rent_of_year" nzPlaceHolder="请输入">
+                </nz-input-number> 元
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">物业费 (年)</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-input-number style="width:186px;" formControlName="fee_of_year" nzPlaceHolder="请输入">
+                </nz-input-number> 元
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">缴费方式</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-select style="width: 200px" formControlName="pay_method" nzAllowClear nzPlaceHolder="请选择">
+                  <nz-option *ngFor="let item of allOriginData.payMethod" [nzValue]="item.value" [nzLabel]="item.label">
+                  </nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">是否有押金</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-select style="width: 200px" formControlName="has_returnable_deposit" nzAllowClear
+                  nzPlaceHolder="请选择">
+                  <nz-option [nzValue]="true" nzLabel="是"></nz-option>
+                  <nz-option [nzValue]="false" nzLabel="否"></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+        </nz-row>
+      </nz-card>
+      <nz-row>
+        <nz-card nzTitle="位置">
+          <nz-row>
+            <nz-col [nzSm]="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">省份</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                  <nz-select style="width: 200px" (ngModelChange)="provinceChange($event)" formControlName="region_key"
+                    nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">城市</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                  <nz-select style="width: 200px" formControlName="city_key" (ngModelChange)="cityChange($event)"
+                    nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of areaData.city" [nzValue]="item.key" [nzLabel]="item.title">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">区域</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                  <nz-select style="width: 200px" formControlName="district_key" nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of areaData.area" [nzValue]="item.key" [nzLabel]="item.title">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">经度</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-input-number style="width:200px;" formControlName="coordinate1" nzPlaceHolder="请输入">
+                  </nz-input-number>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">纬度</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-input-number style="width:200px;" formControlName="coordinate2" nzPlaceHolder="请输入">
+                  </nz-input-number>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">驻点地址</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="address" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+        <nz-card nzTitle="管理员">
+          <nz-row>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">联系人</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="contacter" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">联系电话</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-input-number style="width:200px;" formControlName="contacter_phone" nzPlaceHolder="请输入">
+                  </nz-input-number>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">其他驻点人员</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="roommates" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+        <nz-card nzTitle="其他">
+          <nz-row>
+            <nz-col nzSpan="24">
+              <nz-form-item>
+                <nz-form-label nzSpan="2">工具</nz-form-label>
+                <nz-form-control nzSpan="22" nzErrorTip="请输入">
+                  <textarea style="width: 400px" nz-input placeholder="请输入" formControlName="tools"></textarea>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="24">
+              <nz-form-item>
+                <nz-form-label nzSpan="2">备机</nz-form-label>
+                <nz-form-control nzSpan="22" nzErrorTip="请输入">
+                  <textarea style="width: 400px" nz-input placeholder="请输入" formControlName="instruments"></textarea>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="24">
+              <nz-form-item>
+                <nz-form-label nzSpan="2"></nz-form-label>
+                <nz-form-control nzSpan="22" nzErrorTip="请输入">
+                  <label nz-checkbox formControlName="reagent_store">是否临时存放试剂</label>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <!-- <nz-col nzSpan="24">
+                  <nz-form-item>
+                    <nz-form-label nzSpan="2">固定资产</nz-form-label>
+                    <nz-form-control nzSpan="22" nzErrorTip="请输入">
+                      <textarea style="width: 400px" nz-input placeholder="请输入" formControlName="name"></textarea>
+                    </nz-form-control>
+                  </nz-form-item>
+                </nz-col> -->
+          </nz-row>
+        </nz-card>
+      </nz-row>
+    </form>
+    <div>
+      <nz-row>
+        <nz-col nzSpan="2">
+        </nz-col>
+        <nz-col nzSpan="22">
+          <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="saveModifyData()">保存</button>
+        </nz-col>
+      </nz-row>
+    </div>
+  </nz-card>
+</div>
+
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      驻点信息
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleAdd>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      驻点信息
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      新增
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleModify>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      驻点信息
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      修改
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

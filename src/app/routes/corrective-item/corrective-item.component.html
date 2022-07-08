@@ -1,0 +1,121 @@
+<div class="page_warp">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="user_btns">
+      <span>项目名称：</span>
+      <input class="itemSpace" nz-input style="width:180px;" placeholder="请输入项目名称" [(ngModel)]="keyword" />
+      <span>所属类型：</span>
+      <nz-select style="width: 150px;" [(ngModel)]="category" nzAllowClear nzPlaceHolder="请选择所属类型">
+        <nz-option *ngFor="let item of metaData.category" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+      </nz-select>
+      <button style="margin-left: 8px;" nz-button nzType="default" (click)="search()">查询</button>
+      <button nz-button nzType="primary" (click)="add()" *ngIf="userInfo.dataManager || userInfo.manager">添加</button>
+    </div>
+    <nz-table class="tableData" #basicTable [nzPageSize]="20" [nzData]="tableData" [nzLoading]="loading"
+      [(nzPageIndex)]="pageIndex">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th nzWidth="10%">序号</th>
+          <th nzWidth="20%">所属单元</th>
+          <th nzWidth="20%">项目名称</th>
+          <th nzWidth="10%">是否删除</th>
+          <th *ngIf="userInfo.dataManager || userInfo.manager">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;index as i">
+          <td>{{i + 1 + ((pageIndex-1) * 20)}}</td>
+          <td>{{data.categoryString}}</td>
+          <td>{{data.name}}</td>
+          <td>{{data.delete?"是":"否"}}</td>
+          <td *ngIf="userInfo.dataManager || userInfo.manager">
+            <a (click)="modifyData(data.id)">修改</a>
+            <span class="divider"></span>
+            <a (click)="delete(data.id)">删除</a>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+<!-- 新增数据 -->
+<nz-modal nzMask="false" [(nzVisible)]="newDataModal" nzTitle="新增" [nzOkLoading]="isOkLoading" (nzOnCancel)="newDataModal=false"
+  (nzOnOk)="handleData(1)">
+  <form *ngIf="newDataModal" nz-form [formGroup]="addDataForm" (ngSubmit)="handleData(1)" role="form">
+    <nz-row>
+      <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="5">项目名称</nz-form-label>
+          <nz-form-control [nzSm]="19">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="name" placeholder="请输入项目名称">
+              <nz-form-explain *ngIf="validateForm('name').dirty && validateForm('name').hasError('required')">请输入项目名称
+              </nz-form-explain>
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="5">所属单元</nz-form-label>
+          <nz-form-control [nzSm]="19">
+            <nz-select formControlName="category" nzSize="large" style="width: 100%;" nzAllowClear
+              nzPlaceHolder="请选择所属单元">
+              <nz-option *ngFor="let item of metaData.category" [nzValue]="item.value" [nzLabel]="item.label">
+              </nz-option>
+            </nz-select>
+            <nz-form-explain *ngIf="validateForm('category').dirty && validateForm('category').hasError('required')">
+              请选择所属单元</nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+    </nz-row>
+  </form>
+</nz-modal>
+<!-- 修改数据 -->
+<nz-modal nzMask="false" [(nzVisible)]="modifyDataModal" nzTitle="修改" [nzOkLoading]="isOkLoading" (nzOnCancel)="modifyDataModal=false"
+  (nzOnOk)="handleData(2)">
+  <form *ngIf="modifyDataModal" nz-form [formGroup]="modifyDataForm" (ngSubmit)="handleData(2)" role="form">
+    <nz-row>
+      <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="5">项目名称</nz-form-label>
+          <nz-form-control [nzSm]="19">
+            <nz-input-group nzSize="large" nzPrefixIcon="anticon">
+              <input nz-input formControlName="name" placeholder="请输入项目名称">
+              <nz-form-explain *ngIf="validateForm1('name').dirty && validateForm1('name').hasError('required')">请输入项目名称
+              </nz-form-explain>
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="5">所属单元</nz-form-label>
+          <nz-form-control [nzSm]="19">
+            <nz-select formControlName="category" nzSize="large" style="width: 100%;" nzAllowClear
+              nzPlaceHolder="请选择所属单元">
+              <nz-option *ngFor="let item of metaData.category" [nzValue]="item.value" [nzLabel]="item.label">
+              </nz-option>
+            </nz-select>
+            <nz-form-explain *ngIf="validateForm1('category').dirty && validateForm1('category').hasError('required')">
+              请选择所属单元</nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+    </nz-row>
+  </form>
+</nz-modal>
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      整改任务
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      整改项目
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

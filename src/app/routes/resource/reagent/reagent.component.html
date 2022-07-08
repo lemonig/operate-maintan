@@ -1,0 +1,483 @@
+<div class="page_warp" *ngIf="!showAddPage && !showModifyPage">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="query_warp">
+      <span>试剂名称：</span>
+      <input class="itemSpace" style="width: 200px" nz-input placeholder="请输入" [(ngModel)]="keyword" />
+      <span>试剂分类：</span>
+      <nz-select style="width: 200px" [(ngModel)]="isGroup" nzAllowClear nzPlaceHolder="请选择">
+        <nz-option [nzValue]="3" nzLabel="全部"></nz-option>
+        <nz-option [nzValue]="0" nzLabel="单件"></nz-option>
+        <nz-option [nzValue]="1" nzLabel="配套"></nz-option>
+      </nz-select>&nbsp;&nbsp;
+      <button nz-button nzType="primary" (click)="search()">查询</button>
+      <button nz-button nzType="default" (click)="add()" *ngIf="userInfo.dataManager || dataManager.manager">新建</button>
+      <button nz-button nzType="default" (click)="download()" *ngIf="userInfo.dataManager || dataManager.manager">导出</button>
+    </div>
+    <nz-table class="table_warp" #basicTable [nzData]="tableData" [nzLoading]="loading" [(nzPageIndex)]="q.pageIndex"
+      [(nzTotal)]="q.total" [(nzPageSize)]="q.pageSize" [nzShowSizeChanger]="true" [nzFrontPagination]="false"
+      (nzPageIndexChange)="pageIndexChange($event)" (nzPageSizeChange)="pageSizeChange($event)">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th>序号</th>
+          <th>物料编号</th>
+          <th>试剂名称</th>
+          <th>试剂型号</th>
+          <th>规格</th>
+          <th>浓度</th>
+          <th>保质期</th>
+          <!-- <th>配货量</th> -->
+          <th>适用仪器名称</th>
+          <!-- <th>适用仪器型号</th> -->
+          <th>适用仪器厂家</th>
+          <th>配置文件名称</th>
+          <th>配置文件编号</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;index as i">
+          <td>{{i + 1 + ((q.pageIndex-1) * q.pageSize)}}</td>
+          <td>{{data.material_code}}</td>
+          <td>{{(data.name)}}</td>
+          <td>{{(data.model)}}</td>
+          <td>{{data.bottling}}</td>
+          <td>{{data.consistency}}</td>
+          <td>{{data.in_date}}</td>
+          <!-- <td>{{data.name}}</td> -->
+          <td>{{data.instrument}}</td>
+          <td>{{data.company}}</td>
+          <!-- <td>{{data.name}}</td> -->
+          <td>{{data.recipe_name}}</td>
+          <td>{{data.recipe_code}}</td>
+          <td>
+            <a *ngIf="data.is_group" (click)="config(data.id)">配置</a>
+            <span class="divider" *ngIf="data.is_group"></span>
+            <a (click)="modify(data.id)">修改</a>
+            <span class="divider"></span>
+            <a (click)="delete(data.id)">删除</a>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+<!-- 新增 -->
+<div class="page_warp" *ngIf="showAddPage">
+  <nz-page-header (nzBack)="showAddPage=false" nzBackIcon [nzSubtitle]="nzSubtitleAdd"> </nz-page-header>
+  <nz-card>
+    <form nz-form [formGroup]="addDataForm" role="form">
+      <nz-row>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">试剂名称</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">试剂型号</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="model" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">物料编号</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="material_code" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">规格</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="bottling" />
+              <!-- <nz-select style="width: 200px" formControlName="name" nzAllowClear nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of []" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+              </nz-select> -->
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">浓度</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="consistency" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">保质期</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="in_date" />
+              <!-- <nz-select style="width: 200px" formControlName="name" nzAllowClear nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of []" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+              </nz-select> -->
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <!-- <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">配货量</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col> -->
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label  nzSpan="6">适用仪器名称</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="instrument" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <!-- <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzSpan="6">适用仪器型号</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col> -->
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">适用仪器厂家</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="company" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">配置文件编号</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="recipe_code" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">配置文件名称</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="recipe_name" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">配套试剂</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请选择">
+              <nz-select style="width: 200px" formControlName="is_group" nzAllowClear nzPlaceHolder="请选择">
+                <nz-option [nzValue]="0" nzLabel="否"></nz-option>
+                <nz-option [nzValue]="1" nzLabel="是"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+
+      </nz-row>
+      <!-- <nz-row>
+        <nz-col nzSpan="24">
+          <nz-form-item>
+            <nz-form-label nzSpan="2">备注</nz-form-label>
+            <nz-form-control nzSpan="22" nzErrorTip="请输入">
+              <textarea style="width: 200px" nz-input placeholder="请输入" formControlName="dec"></textarea>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+      </nz-row> -->
+    </form>
+    <div>
+      <nz-row>
+        <nz-col nzSpan="2">
+        </nz-col>
+        <nz-col nzSpan="22">
+          <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="saveNewData()">保存</button>
+        </nz-col>
+      </nz-row>
+    </div>
+  </nz-card>
+</div>
+
+<!-- 修改 -->
+<div class="page_warp" *ngIf="showModifyPage">
+  <nz-page-header (nzBack)="showModifyPage=false" nzBackIcon [nzSubtitle]="nzSubtitleModify"> </nz-page-header>
+  <nz-card>
+    <form nz-form [formGroup]="modifyDataForm" role="form">
+      <nz-row>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">试剂名称</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">试剂型号</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="model" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">物料编号</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="material_code" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">规格</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="bottling" />
+              <!-- <nz-select style="width: 200px" formControlName="name" nzAllowClear nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of []" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+              </nz-select> -->
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">浓度</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="consistency" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">保质期</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="in_date" />
+              <!-- <nz-select style="width: 200px" formControlName="name" nzAllowClear nzPlaceHolder="请选择">
+                <nz-option *ngFor="let item of []" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+              </nz-select> -->
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <!-- <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">配货量</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col> -->
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzSpan="6">适用仪器名称</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="instrument" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <!-- <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">适用仪器型号</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col> -->
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzSpan="6">适用仪器厂家</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="company" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">配置文件编号</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="recipe_code" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+          <nz-form-item>
+            <nz-form-label nzRequired nzSpan="6">配置文件名称</nz-form-label>
+            <nz-form-control nzSpan="18" nzErrorTip="请输入">
+              <input style="width:200px;" nz-input placeholder="请输入" formControlName="recipe_name" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="8">
+           <nz-form-item>
+             <nz-form-label nzRequired nzSpan="6">配套试剂</nz-form-label>
+             <nz-form-control nzSpan="18" nzErrorTip="请选择">
+               <nz-select style="width: 200px"  formControlName="is_group"
+                 nzPlaceHolder="请选择">
+                 <nz-option [nzValue]="0" nzLabel="否"></nz-option>
+                 <nz-option [nzValue]="1" nzLabel="是"></nz-option>
+               </nz-select>
+             </nz-form-control>
+           </nz-form-item>
+         </nz-col>
+      </nz-row>
+      <!-- <nz-row>
+        <nz-col nzSpan="24">
+          <nz-form-item>
+            <nz-form-label nzSpan="2">备注</nz-form-label>
+            <nz-form-control nzSpan="22" nzErrorTip="请输入">
+              <textarea style="width: 200px" nz-input placeholder="请输入" formControlName="dec"></textarea>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+      </nz-row> -->
+
+
+    </form>
+    <div>
+      <nz-row>
+        <nz-col nzSpan="2">
+        </nz-col>
+        <nz-col nzSpan="22">
+          <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="saveModifyData()">保存</button>
+        </nz-col>
+      </nz-row>
+    </div>
+  </nz-card>
+
+</div>
+<nz-modal nzMask="false" class="modal_warp" nzWidth="1600px" [(nzVisible)]="showconfigPage" [nzOkText]="null"
+    [nzCancelText]="null" (nzOnCancel)="showconfigPage=false" [nzTitle]="'配置试剂'">
+    <nz-row [nzGutter]=20>
+      <nz-col nzSpan="6">
+        <span>试剂名称：</span>
+        <input style="width: 60%;" nz-input placeholder="请输入名称" [(ngModel)]="queryName" (ngModelChange)="queryChange()" />
+      </nz-col>
+      <nz-col nzSpan="6">
+        <span>仪器厂家：</span>
+        <nz-select style="width: 60%;" nzAllowClear="true" [(ngModel)]="queryCompany" (ngModelChange)="companyChange()"
+          nzPlaceHolder="请选择">
+          <nz-option *ngFor="let item of modalInitData" [nzValue]="item.companyName" [nzLabel]="item.companyName">
+          </nz-option>
+        </nz-select>
+      </nz-col>
+    </nz-row>
+    <nz-row style="margin-top:20px;" [nzGutter]=20>
+      <nz-col nzSpan="11">
+        <span>试剂列表</span>
+        <div class="list_warp">
+          <nz-table class="table_warp" [nzData]="goodsList" [nzShowPagination]="false">
+            <thead>
+              <tr>
+                <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminate" [(nzChecked)]="isAllChecked"
+                  (nzCheckedChange)="checkAll($event)"></th>
+                <th nzWidth="10%">序号</th>
+                <th nzWidth="30%">名称</th>
+                <th nzWidth="30%">规格</th>
+                <th nzWidth="30%">浓度</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let data of goodsList;index as i">
+                <tr *ngIf="data.name?.includes(queryName ? queryName : '') &&
+                data.company?.includes(queryCompany ? queryCompany:'')">
+                  <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatus()"></td>
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ data.name }}</td>
+                  <td>{{ data.bottling }}</td>
+                  <td>{{ data.consistency }}</td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </nz-table>
+        </div>
+      </nz-col>
+      <nz-col nzSpan="2">
+        <div class="btn_warp">
+          <div>
+            <button nz-button nzType="primary" [disabled]="checkedGoods.length === 0" (click)="saveGoods($event)">
+              &gt;&gt;
+            </button>
+            <br><br>
+            <button nz-button nzType="primary" [disabled]="checkedSelectedGoods.length === 0"
+              (click)="deleteGoods($event)">
+              &lt;&lt;
+            </button>
+          </div>
+        </div>
+      </nz-col>
+      <nz-col nzSpan="11">
+        <span>已配列表</span>
+        <div class="list_warp">
+          <nz-table class="table_warp" [nzData]="selectedGoodsList" [nzShowPagination]="false">
+            <thead>
+              <tr>
+                <th nzWidth="5%" nzShowCheckbox [nzIndeterminate]="isIndeterminateS" [(nzChecked)]="isAllCheckedS"
+                  (nzCheckedChange)="checkAllS($event)"></th>
+                <th nzWidth="10%">序号</th>
+                <th nzWidth="40%">名称</th>
+                <th nzWidth="50%">物料编号</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let data of selectedGoodsList;index as i">
+                <tr>
+                  <td nzShowCheckbox [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatusS()"></td>
+                 <td>{{ i + 1 }}</td>
+                 <td>{{ data.name }}</td>
+                 <td>{{ data.material_code }}</td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </nz-table>
+        </div>
+      </nz-col>
+    </nz-row>
+  </nz-modal>
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      物料库管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      试剂清单管理
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleAdd>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      物料库管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      试剂清单管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      新增
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleModify>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      物料库管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      试剂清单管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      修改
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

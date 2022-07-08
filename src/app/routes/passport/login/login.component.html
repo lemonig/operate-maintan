@@ -1,0 +1,42 @@
+<div id="login-bg">
+  <div class="login-area">
+    <div class="login-form">
+      <nz-row nzGutter="8">
+        <nz-col nzSpan="8">
+          <div id="login-side-img"></div>
+        </nz-col>
+        <nz-col nzSpan="16">
+          <h3 class="text-center font-weight-bold pt-md pb-sm">账号登录</h3>
+          <form nz-form [formGroup]="form" (ngSubmit)="submit()" role="form" class="px-md">
+            <nz-form-item>
+              <nz-form-control>
+                <nz-input-group nzSize="large" nzPrefixIcon="anticon anticon-user">
+                  <input nz-input formControlName="username" placeholder="账户">
+                </nz-input-group>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-control>
+                <nz-input-group nzSize="large" nzPrefixIcon="anticon anticon-lock">
+                  <input nz-input type="password" formControlName="password" placeholder="密码">
+                </nz-input-group>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-col [nzSpan]="12">
+                <label nz-checkbox formControlName="remember">自动登录</label>
+              </nz-col>
+              <nz-col [nzSpan]="12" class="text-right">
+                <!-- <a class="forgot" (click)="goFindPassword()">忘记密码</a>  功能不要了-->
+              </nz-col>
+            </nz-form-item>
+            <nz-form-item>
+              <button nz-button type="submit" nzType="primary" [nzLoading]="loading" nzBlock>登录</button>
+            </nz-form-item>
+          </form>
+        </nz-col>
+      </nz-row>
+
+    </div>
+  </div>
+</div>

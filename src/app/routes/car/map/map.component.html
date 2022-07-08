@@ -1,0 +1,32 @@
+<div class="map_warp" [ngClass]="{hasFooter: systemBelong}">
+    <div #mapContainer class="mapContainer"></div>
+    <div class="mapStatus">
+        <!-- <nz-radio-group nzButtonStyle="solid" nzSize="small" [(ngModel)]="mapMode" (ngModelChange)="changeMode($event)">
+            <label nz-radio-button [nzValue]="1">网络状态</label>
+            <label nz-radio-button [nzValue]="2">报警状态</label>
+			<label nz-radio-button [nzValue]="3">安装模式</label>
+        </nz-radio-group> -->
+          <nz-select nzShowSearch nzServerSearch [nzFilterOption]="nzFilterOption"
+            (nzOnSearch)="filterOpsList($event)" style="width: 200px" [(ngModel)]="mapMode" nzAllowClear
+            nzPlaceHolder="请选择">
+            <nz-option *ngFor="let item of opsList" [nzValue]="item.imei" [nzLabel]="item.car_num">
+            </nz-option>
+          </nz-select>
+          &nbsp;&nbsp;
+          <nz-date-picker style="width:200px;"  [(ngModel)]="traceDay" nzPlaceHolder="选择日期"></nz-date-picker>&nbsp;&nbsp;
+          <button nz-button nzType="primary"  (click)="select()">查询</button>
+    </div>
+    <div class="mapCar">
+      <div class="input-card">
+          <h4>轨迹回放控制</h4>
+          <div class="input-item">
+              <input type="button" class="btn" value="开始动画"  (click)="startAnimation()"/>
+              <input type="button" class="btn" value="暂停动画"  (click)="pauseAnimation()"/>
+          </div>
+          <div class="input-item">
+              <input type="button" class="btn" value="继续动画"  (click)="resumeAnimation()"/>
+              <input type="button" class="btn" value="停止动画"  (click)="stopAnimation()"/>
+          </div>
+      </div>
+    </div>
+</div>

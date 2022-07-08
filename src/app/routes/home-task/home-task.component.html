@@ -1,0 +1,208 @@
+<!-- <full-content [padding]=0> -->
+<div id="body">
+  <!-- <img
+    src="../../../../assets/tmp/img/index.png"> -->
+  <div class="title">
+    <h1>异常任务概览&nbsp;&nbsp;<nz-year-picker nzFormat="YYYY"   [(ngModel)]="startYear"  (ngModelChange)="onChangeYear($event)"></nz-year-picker></h1>
+
+  </div>
+    <nz-row [nzGutter]="16">
+      <nz-col [nzSpan]="24">
+          <nz-card nzType="inner" nzTitle="异常整合" >
+            <nz-row [nzGutter]="16">
+
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="taskStatistics.taskCompletion | number" [nzTitle]="'异常任务完成率(包含正在执行任务)'" [nzSuffix]="'%'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="taskStatistics.taskCompletion2 | number" [nzTitle]="'异常任务完成率'" [nzSuffix]="'%'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="taskStatistics.terminationCount | number" [nzTitle]="'下发的异常任务终止率'" [nzSuffix]="'%'"> </nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="taskStatistics.overDoPercentage | number" [nzTitle]="'超时未完成占比'" [nzSuffix]="'%'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="taskStatistics.overEndPercentage | number" [nzTitle]="'超时已完成占比'" [nzSuffix]="'%'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="taskStatistics.overtimePercentage | number" [nzTitle]="'超时率'" [nzSuffix]="'%'"></nz-statistic>
+                </nz-col>
+
+            </nz-row>
+            <nz-row [nzGutter]="16" style = "padding-top: 10px;">
+              <nz-col [nzSpan]="4">
+                <nz-statistic [nzValue]="taskStatistics.taskCount | number" [nzTitle]="'下发异常任务总个数'" [nzSuffix]="'个'"></nz-statistic>
+              </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="taskStatistics.dealType | number" [nzTitle]="'到站处理占比'" [nzSuffix]="'%'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="taskStatistics.productCaused | number" [nzTitle]="'产品质量缺陷导致占比'" [nzSuffix]="'%'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="taskStatistics.taskUnitCount | number" [nzTitle]="'总异常任务中，异常单元包含比'" [nzSuffix]="'%'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="taskStatistics.taskInstrumentCount | number" [nzTitle]="'总异常任务中，异常仪器包含比'" [nzSuffix]="'%'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="4">
+                  <nz-statistic [nzValue]="taskStatistics.readCount | number" [nzTitle]="'管理员已阅任务'" [nzSuffix]="'%'"></nz-statistic>
+                </nz-col>
+
+            </nz-row>
+
+            </nz-card>
+   </nz-col>
+   <nz-col [nzSpan]="12" >
+       <nz-card nzType="inner" nzTitle="异常任务站点省份分布" >
+         <div class="left_row" echarts [options]="doubleBar" style="height: 300px;"></div>
+       </nz-card>
+   </nz-col>
+   <nz-col [nzSpan]="12">
+       <nz-card nzType="inner" nzTitle="任务时长占比分析(小时)"  [nzExtra]="extraTemplate">
+
+       <div class="left_row" echarts [options]="endTimePie" (chartInit)="onChart1($event)" style="height: 300px;"></div>
+       </nz-card>
+       <ng-template #extraTemplate>
+        <nz-select style="width: 200px" [(ngModel)]="regionKey1" nzAllowClear nzPlaceHolder="请选择" (ngModelChange)="getNewDraw(1)">
+           <nz-option *ngFor="let item of taskMate" [nzValue]="item.value" [nzLabel]="item.name"></nz-option>
+        </nz-select>
+      </ng-template>
+   </nz-col>
+   <nz-col [nzSpan]="12">
+       <nz-card nzType="inner" nzTitle="异常单元占比分析" [nzExtra]="extraTemplate2">
+       <div class="left_row" echarts [options]="taskUnit" (chartInit)="onChart2($event)" style="height: 300px;"></div>
+       </nz-card>
+       <ng-template #extraTemplate2>
+         <nz-select style="width: 200px" [(ngModel)]="regionKey2" nzAllowClear nzPlaceHolder="请选择" (ngModelChange)="getNewDraw(2)">
+            <nz-option *ngFor="let item of taskMate" [nzValue]="item.value" [nzLabel]="item.name"></nz-option>
+         </nz-select>
+       </ng-template>
+   </nz-col>
+   <nz-col [nzSpan]="12">
+       <nz-card nzType="inner" nzTitle="厂家所含异常仪器个数" [nzExtra]="extraTemplate5">
+       <div class="left_row" echarts [options]="taskCompanyInstument" (chartInit)="onChart5($event)" style="height: 300px;"></div>
+       </nz-card>
+       <ng-template #extraTemplate5>
+         <nz-select style="width: 200px" [(ngModel)]="regionKey4" nzAllowClear nzPlaceHolder="请选择" (ngModelChange)="getNewDraw(4)">
+            <nz-option *ngFor="let item of taskMate" [nzValue]="item.value" [nzLabel]="item.name"></nz-option>
+         </nz-select>
+       </ng-template>
+   </nz-col>
+
+<nz-col [nzSpan]="12">
+       <nz-card nzType="inner" nzTitle="站点包含异常任务数" [nzExtra]="extraTemplate6">
+       <div class="left_row" echarts [options]="taskStationFrequency" (chartInit)="onChart6($event)" style="height: 338px;"></div>
+       </nz-card>
+       <ng-template #extraTemplate6>
+         <nz-select style="width: 200px" [(ngModel)]="regionKey5" nzAllowClear nzPlaceHolder="请选择" (ngModelChange)="getNewDraw(5)">
+            <nz-option *ngFor="let item of taskMate" [nzValue]="item.value" [nzLabel]="item.name"></nz-option>
+         </nz-select>
+       </ng-template>
+   </nz-col>
+<nz-col [nzSpan]="12">
+       <nz-card nzType="inner" nzTitle="异常仪器数量" [nzExtra]="extraTemplate3">
+       <div *ngIf="!instrmentTable" class="left_row" echarts [options]="taskInstrument" (chartInit)="onChart3($event)" style="height: 338px;"></div>
+        <nz-table *ngIf="instrmentTable" nzSize="middle" #filterTable [nzData]="showInstrumentCompanyList" [nzScroll]="{ y: '240px' }" [nzPageSize]="1000">
+             <thead (nzSortChange)="sort($event)" nzSingleSort>
+               <tr>
+                 <th
+                   nzShowFilter
+                   [nzFilters]="listOfName"
+                   (nzFilterChange)="filter($event, listOfSearchCompany)"
+                   nzWidth="300px"
+                 >
+                   仪器名称
+                 </th>
+                 <th nzShowSort nzSortKey="value" nzWidth="100px" >数量</th>
+                 <th
+                   nzShowFilter
+                   [(nzFilters)]="listOfCompany"
+                   (nzFilterChange)="filter(listOfSearchName, $event)"
+                 >
+                   生产厂家
+                 </th>
+               </tr>
+             </thead>
+             <tbody>
+               <tr *ngFor="let data of filterTable.data">
+                 <td>{{ data.name }}</td>
+                 <td>{{ data.value }}</td>
+                 <td>{{ data.label }}</td>
+               </tr>
+             </tbody>
+           </nz-table>
+       </nz-card>
+       <ng-template #extraTemplate3>
+         <a (click)="changeType()" style="margin-right: 10px;">切换</a>
+         <nz-select style="width: 200px" [(ngModel)]="regionKey3" nzAllowClear nzPlaceHolder="请选择" (ngModelChange)="getNewDraw(3)">
+            <nz-option *ngFor="let item of taskMate" [nzValue]="item.value" [nzLabel]="item.name"></nz-option>
+         </nz-select>
+       </ng-template>
+   </nz-col>
+  <nz-col [nzSpan]="12">
+         <nz-card nzType="inner" nzTitle="异常任务各状态每日个数" [nzExtra]="extraTemplate7">
+           <nz-range-picker [(ngModel)]="dateRange2" (ngModelChange)="log($event)"></nz-range-picker>
+         <div class="left_row" echarts [options]="taskChange" (chartInit)="onChart7($event)" style="height: 338px;"></div>
+         </nz-card>
+         <ng-template #extraTemplate7>
+           <nz-select style="width: 200px" [(ngModel)]="regionKey6" nzAllowClear nzPlaceHolder="请选择" (ngModelChange)="getNewDraw(6)">
+              <nz-option *ngFor="let item of taskMate" [nzValue]="item.value" [nzLabel]="item.name"></nz-option>
+           </nz-select>
+         </ng-template>
+     </nz-col>
+     <nz-col [nzSpan]="12">
+            <nz-card nzType="inner" nzTitle="异常任务各状态持续时间" [nzExtra]="extraTemplate8">
+            <nz-range-picker [(ngModel)]="dateRange3" (ngModelChange)="log($event)"></nz-range-picker>
+            <div class="left_row" echarts [options]="taskAge" (chartInit)="onChart8($event)" style="height: 338px;"></div>
+            </nz-card>
+            <ng-template #extraTemplate8>
+              <nz-select style="width: 200px" [(ngModel)]="regionKey7" nzAllowClear nzPlaceHolder="请选择" (ngModelChange)="getNewDraw(7)">
+                 <nz-option *ngFor="let item of taskMate" [nzValue]="item.value" [nzLabel]="item.name"></nz-option>
+              </nz-select>
+            </ng-template>
+        </nz-col>
+
+  <nz-col [nzSpan]="24">
+         <nz-card nzType="inner" nzTitle="异常任务阅读情况" [nzExtra]="extraTemplate4" >
+           <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="log($event)"></nz-range-picker>
+         <div class="left_row" echarts [options]="taskRead" (chartInit)="onChart4($event)" style="height: 300px;"></div>
+         </nz-card>
+         <ng-template #extraTemplate4>
+           <nz-checkbox-group [(ngModel)]="powerList" (ngModelChange)="log($event)">
+                       </nz-checkbox-group>
+         </ng-template>
+     </nz-col>
+     <nz-col [nzSpan]="24">
+            <nz-card nzType="inner" nzTitle="异常常见词汇" >
+              <nz-row>
+                <nz-col [nzSpan]="12">
+                  <div class="left_row" echarts [options]="taskWord1"  style="height: 300px;"></div>
+                  <div class="left_row" echarts [options]="taskWord2"  style="height: 300px;"></div>
+                </nz-col>
+                <nz-col [nzSpan]="12">
+                  <div class="left_row" echarts [options]="taskWord3"  style="height: 300px;"></div>
+                  <div class="left_row" echarts [options]="taskWord4"  style="height: 300px;"></div>
+                </nz-col>
+              </nz-row>
+            </nz-card>
+
+        </nz-col>
+
+
+    </nz-row>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<!-- </full-content> -->

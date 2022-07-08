@@ -1,0 +1,62 @@
+<div class="page_warp">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+  <nz-card>
+    <div class="user_btns">
+      <button nz-button nzType="primary" (click)="add()">添加</button>
+    </div>
+    <nz-table class="table_warp" #basicTable [(nzPageSize)]="PageSize" [nzData]="tableData" [nzLoading]="loading"
+      [(nzPageIndex)]="pageIndex" [nzShowSizeChanger]="true">
+      <thead>
+        <tr style="position: relative;" appTableScroll>
+          <th nzWidth="50%">序号</th>
+          <th nzWidth="50%">快捷输入</th>
+          <!-- <th>操作</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data;index as i">
+          <td>{{i + 1 + ((pageIndex-1) * PageSize)}}</td>
+          <td>{{data}}</td>
+          <!-- <td>
+              <a (click)="modifyData(data.id)">修改</a>
+              <nz-divider nzType="vertical"></nz-divider>
+              <a (click)="delete(data.id)">删除</a>
+            </td> -->
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+<!-- 新增数据 -->
+<nz-modal nzMask="false" [(nzVisible)]="newDataModal" nzTitle="新增" [nzOkLoading]="isOkLoading"
+  (nzOnCancel)="newDataModal=false" (nzOnOk)="handleNewData()">
+  <form *ngIf="newDataModal" nz-form [formGroup]="addDataForm" (ngSubmit)="handleNewData()" role="form">
+    <nz-row>
+      <nz-col [nzSm]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired [nzSm]="6">关键字</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <textarea style="height: 200px;" nz-input placeholder="请输入关键字" formControlName="shortcuts"></textarea>
+            <nz-form-explain *ngIf="validateForm('shortcuts').dirty && validateForm('shortcuts').hasError('required')">
+              请输入关键字
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+    </nz-row>
+  </form>
+</nz-modal>
+
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      异常任务
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      快捷输入
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

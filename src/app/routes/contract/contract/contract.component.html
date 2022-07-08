@@ -1,0 +1,444 @@
+<div class="list_warp" *ngIf="!showRenewalPage && !showAddPage">
+  <nz-page-header [nzSubtitle]="nzSubtitle"> </nz-page-header>
+
+  <nz-tabset [(nzSelectedIndex)]="currentTab" (nzSelectChange)="changeTab()">
+    <nz-tab nzTitle="待完成合同">
+      <ng-container *ngIf="currentTab == 0">
+        <app-contract-pending (showRenewalPageEmitter)="showRenewalPageReceive($event)"
+          (showAddPageEmitter)="showAddPageReceive()"></app-contract-pending>
+      </ng-container>
+    </nz-tab>
+    <nz-tab nzTitle="已结束合同">
+      <ng-container *ngIf="currentTab == 1">
+        <app-contract-over></app-contract-over>
+      </ng-container>
+    </nz-tab>
+
+  </nz-tabset>
+
+</div>
+
+<!-- 续签 -->
+<div class="page_warp" *ngIf="showRenewalPage">
+  <nz-page-header (nzBack)="showRenewalPage=false" nzBackIcon [nzSubtitle]="nzSubtitleRenewal"> </nz-page-header>
+  <nz-card>
+    <form nz-form [formGroup]="modifyDataForm" *ngIf="modifyDataForm" role="form">
+      <nz-card nzTitle="合同信息">
+        <nz-row>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">合同名称</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">合同编号</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="num" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">工程项目经理</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="project_manager" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">合同开始时间</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-date-picker style="width:200px;" formControlName="start_date"></nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">合同结束时间</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-date-picker style="width:200px;" formControlName="end_date"></nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">监测频次</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="daily_count" /> 小时/次
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">省份</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-select style="width: 200px" formControlName="region_key" nzPlaceHolder="请选择">
+                  <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title">
+                  </nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">合同金额</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="total" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">运维费用</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="ops_money" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">合同状态</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                <nz-select style="width: 200px" formControlName="state" nzPlaceHolder="请选择">
+                  <nz-option *ngFor="let item of contractStateList" [nzValue]="item.value" [nzLabel]="item.label">
+                  </nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">运维开始时间</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-date-picker style="width:200px;" formControlName="ops_start_date"></nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">运维结束时间</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-date-picker style="width:200px;" formControlName="ops_end_date"></nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzSpan="6">校验时间</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-date-picker style="width:200px;" formControlName="check_date"></nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="2" style="color: rgba(0, 0, 0, 0.85);text-align: right;padding-right: 5px;">
+            <div>站点数量:</div>
+          </nz-col>
+          <nz-col nzSpan="6" style="color: rgba(0, 0, 0, 0.85);padding-left: 5px;">
+            <div>{{stationCount}}</div>
+          </nz-col>
+        </nz-row>
+      </nz-card>
+      <nz-row>
+        <nz-card nzTitle="业主信息">
+          <nz-row>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">业主单位</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="company" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">单位联系人</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="contacter" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">联系方式</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-input-number style="width:200px;" formControlName="phone" nzPlaceHolder="请输入">
+                  </nz-input-number>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+
+
+
+
+        <nz-card nzTitle="备注">
+          <nz-row>
+            <nz-col nzSpan="24">
+              <nz-form-item>
+                <nz-form-control nzSpan="24" nzErrorTip="请输入">
+                  <textarea style="width: 400px" nz-input placeholder="请输入" formControlName="description"></textarea>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+      </nz-row>
+    </form>
+    <div>
+      <nz-row>
+        <nz-col nzSpan="2">
+        </nz-col>
+        <nz-col nzSpan="22">
+          <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="saveRenewalData()">保存</button>
+        </nz-col>
+      </nz-row>
+    </div>
+  </nz-card>
+</div>
+<!-- 新增 -->
+<div class="page_warp" *ngIf="showAddPage">
+  <nz-page-header (nzBack)="showAddPage=false" nzBackIcon [nzSubtitle]="nzSubtitleAdd"> </nz-page-header>
+
+  <nz-card>
+
+    <form nz-form [formGroup]="addDataForm" role="form">
+      <nz-card nzTitle="合同信息">
+        <nz-row>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">合同名称</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="name" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">合同编号</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="num" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">工程项目经理</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="project_manager" />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">合同开始时间</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-date-picker style="width:200px;" formControlName="start_date"></nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">合同结束时间</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <nz-date-picker style="width:200px;" formControlName="end_date"></nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col nzSpan="8">
+            <nz-form-item>
+              <nz-form-label nzRequired nzSpan="6">监测频次</nz-form-label>
+              <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                <input style="width:200px;" nz-input placeholder="请输入" formControlName="daily_count" /> 小时/次
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+        </nz-row>
+      </nz-card>
+      <nz-row>
+        <nz-card nzTitle="业主信息">
+          <nz-row>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">业主单位</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="company" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">单位联系人</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="contacter" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">联系方式</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-input-number style="width:200px;" formControlName="phone" nzPlaceHolder="请输入"></nz-input-number>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">省份</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                  <nz-select style="width: 200px" formControlName="region_key" nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of areaData.province" [nzValue]="item.key" [nzLabel]="item.title">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">合同金额</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="total" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">运维费用</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <input style="width:200px;" nz-input placeholder="请输入" formControlName="ops_money" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzRequired nzSpan="6">合同状态</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请选择">
+                  <nz-select style="width: 200px" formControlName="state" nzPlaceHolder="请选择">
+                    <nz-option *ngFor="let item of contractStateList" [nzValue]="item.value" [nzLabel]="item.label">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">运维开始时间</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-date-picker style="width:200px;" formControlName="ops_start_date"></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">运维结束时间</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-date-picker style="width:200px;" formControlName="ops_end_date"></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="8">
+              <nz-form-item>
+                <nz-form-label nzSpan="6">校验时间</nz-form-label>
+                <nz-form-control nzSpan="18" nzErrorTip="请输入">
+                  <nz-date-picker style="width:200px;" formControlName="check_date"></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+
+        </nz-card>
+
+        <!-- <nz-card nzTitle="运维考核要求">
+           <nz-row>
+             <nz-col nzSpan="24">
+               <nz-form-item>
+                 <nz-form-control nzSpan="24" nzErrorTip="请输入">
+                   <textarea style="width: 400px" nz-input placeholder="请输入" formControlName="name"></textarea>
+                 </nz-form-control>
+               </nz-form-item>
+             </nz-col>
+             <nz-col nzSpan="24">
+               <nz-form-item>
+                 <nz-form-control nzSpan="24">
+                   <nz-upload [nzCustomRequest]="fileUpload" [(nzFileList)]="fileList">
+                     <button nz-button><i nz-icon nzType="upload"></i><span>上传文件</span></button>
+                   </nz-upload>
+                   <div>支持扩展名：.rar .zip .doc .docx .pdf .jpg...</div>
+                 </nz-form-control>
+               </nz-form-item>
+             </nz-col>
+           </nz-row>
+         </nz-card> -->
+
+
+        <nz-card nzTitle="备注">
+          <nz-row>
+            <nz-col nzSpan="24">
+              <nz-form-item>
+                <nz-form-control nzSpan="24" nzErrorTip="请输入">
+                  <textarea style="width: 400px" nz-input placeholder="请输入" formControlName="name"></textarea>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+      </nz-row>
+    </form>
+    <div>
+      <nz-row>
+        <nz-col nzSpan="2">
+        </nz-col>
+        <nz-col nzSpan="22">
+          <button nz-button nzType="primary" [nzLoading]="btnLoading" (click)="saveNewData()">保存</button>
+        </nz-col>
+      </nz-row>
+    </div>
+  </nz-card>
+</div>
+
+
+<ng-template #nzSubtitle>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      异常任务
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+
+<ng-template #nzSubtitleRenewal>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      合同管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      续签
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>
+<ng-template #nzSubtitleAdd>
+  <nz-breadcrumb nzSeparator=">">
+    <span class="CPosition">当前位置 :</span>
+    <nz-breadcrumb-item>
+      合同管理
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      列表查询
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      新增
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</ng-template>

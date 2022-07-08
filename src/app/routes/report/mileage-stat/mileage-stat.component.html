@@ -1,0 +1,46 @@
+<div class="page_warp">
+    <!-- <nz-page-header [nzSubtitle]="车辆使用统计"> </nz-page-header> -->
+    <nz-card>
+      <div class="query_warp">
+        <div class="searchItem itemSpace">
+          <span>统计月份：</span>
+          <nz-date-picker [(ngModel)]="startDate"  nzPlaceHolder="选择日期" ></nz-date-picker>
+
+          <button nz-button nzType="primary" (click)="search()">查询</button>
+          <button nz-button nzType="default" (click)="download()">导出</button>
+        </div>
+      </div>
+      <nz-table class="table_warp" #basicTable [nzPageSize]="20" [(nzPageIndex)]="pageIndex" [nzData]="tableData"
+      [nzLoading]="loading">
+        <thead>
+          <tr style="position: relative;" appTableScroll>
+            <!-- <th>序号</th> -->
+            <th>车牌</th>
+            <th>使用人</th>
+            <th>使用公司</th>
+            <th>使用部门</th>
+            <th>省份</th>
+            <th>城市</th>
+            <th>本日上报次数</th>
+            <th>本月上报次数</th>
+            <th>本月上报天数</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of basicTable.data;index as i">
+            <!-- <td>{{i + 1 + ((pageIndex-1) * 20)}}</td> -->
+            <td>{{data.car_num}}</td>
+            <td>{{data.driver}}</td>
+            <td>{{data.company}}</td>
+            <td>{{data.dept}}</td>
+            <td>{{data.region}}</td>
+            <td>{{data.city}}</td>
+            <td>{{data.count_day}}</td>
+            <td>{{data.count_month}}</td>
+            <td>{{data.count_day_in_month}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </nz-card>
+  </div>
+  
